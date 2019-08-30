@@ -1,1 +1,7 @@
-export const APP_BACKGROUND = '#ff4747'
+export const APP_BACKGROUND = '#fafafa'
+export const SHADOW_BLACK = '#757575'
+export const PRIMARY_TEXT = '#707070'
+export const ACTION_RED = '#ff4747'
+export const BLACK = '#000000'
+export const DISABLED_GRAY = '#d1d1d1'
+export const WHITE = '#fff'

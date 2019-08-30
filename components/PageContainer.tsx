@@ -1,13 +1,13 @@
 import React, { ReactNode } from 'react'
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, KeyboardAvoidingView } from 'react-native'
 
 import { APP_BACKGROUND } from '../common/colors'
 
 const PageContainer = ({ children }: { children: ReactNode }) => {
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container} behavior='padding'>
           { children }
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 

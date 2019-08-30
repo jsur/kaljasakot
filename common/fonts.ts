@@ -1,0 +1,1 @@
+export const FONT_REGULAR = 'roboto-regular'

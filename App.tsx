@@ -1,5 +1,4 @@
 import React from 'react'
-import { StyleSheet } from 'react-native'
 import {
   createStackNavigator,
   createBottomTabNavigator,
@@ -11,9 +10,7 @@ import AddBeer from './components/AddBeer'
 import Settings from './components/Settings'
 import Login from './components/Login'
 
-import { white } from './common/colors'
-
-const FONT_REGULAR = 'roboto-regular'
+import { FONT_REGULAR } from './common/fonts'
 
 const LoggedInNavigator = createBottomTabNavigator({
   AddBeer: AddBeer,

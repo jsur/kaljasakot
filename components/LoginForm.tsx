@@ -1,24 +1,48 @@
 
 import React, { useState } from 'react'
-import { TextInput, View, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 
-const LoginFields = () => {
+import InputField from './InputField'
+import Button from './Button'
+
+export interface LoginFormInputs {
+  email: string,
+  password: string
+}
+
+interface LoginFormProps {
+  onSubmit: () => LoginFormInputs
+}
+
+const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   return (
     <View style={styles.form}>
-      <TextInput
-        style={styles.input}
+      <InputField
+        placeholder='Email'
+        returnKeyType='next'
+        autoFocus
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        autoCapitalize='none'
+        onChangeText={setEmail}
       />
       <View style={styles.filler} />
-      <TextInput
-        style={styles.input}
+      <InputField
+        placeholder='Salasana'
+        returnKeyType='done'
+        autoFocus
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        autoCapitalize='none'
+        onChangeText={setPassword}
       />
+      <View style={{ marginTop: '5%' }}>
+        <Button
+          text='Valmis'
+          disabled={!email || !password}
+          onPress={() => onSubmit({email, password})} />
+      </View>
     </View>
   )
 }
@@ -26,17 +50,13 @@ const LoginFields = () => {
 const styles = StyleSheet.create({
   form: {
     width: '100%',
+    height: '40%',
     justifyContent: 'center',
     alignItems: 'center'
   },
   filler: {
     height: '5%'
-  },
-  input: {
-    backgroundColor: 'white',
-    width: '90%',
-    height: '20%'
   }
 })
 
-export default LoginFields
+export default LoginForm
