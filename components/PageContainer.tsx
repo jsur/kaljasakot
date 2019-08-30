@@ -3,9 +3,15 @@ import { StyleSheet, KeyboardAvoidingView } from 'react-native'
 
 import { APP_BACKGROUND } from '../common/colors'
 
-const PageContainer = ({ children }: { children: ReactNode }) => {
+const PageContainer = ({ children, backgroundColor }: { children: ReactNode, backgroundColor: string }) => {
     return (
-        <KeyboardAvoidingView style={styles.container} behavior='padding'>
+        <KeyboardAvoidingView
+          style={[
+            styles.container,
+            { backgroundColor: backgroundColor || APP_BACKGROUND }
+          ]}
+          behavior='padding'
+        >
           { children }
         </KeyboardAvoidingView>
     )
@@ -13,12 +19,10 @@ const PageContainer = ({ children }: { children: ReactNode }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: APP_BACKGROUND,
     flex: 1,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '5%',
     position: 'relative',
     zIndex: 1
   }
