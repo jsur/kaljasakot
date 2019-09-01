@@ -24,10 +24,12 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
-  const login = useCallback(async () => {
+
+  const login = useCallback(async (email: string, password: string) => {
     if (loading) return
     setLoading(true)
     try {
+      console.log(email, password)
       await firebase.auth().signInWithEmailAndPassword(email, password)
       setLoading(false)
       onSuccess()
@@ -65,13 +67,14 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
           setErrorMsg('')
           setPassword(text)
         }}
-        onSubmitEditing={login}
+        onSubmitEditing={() => login(email, password)}
       />
       <View style={{ marginTop: '5%' }}>
         <Button
           text='Valmis'
-          disabled={!email || !password}
-          onPress={login} />
+          loading={loading}
+          disabled={loading || !email || !password}
+          onPress={() => login(email, password)} />
       </View>
     </View>
   )

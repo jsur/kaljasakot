@@ -1,5 +1,5 @@
 import React from 'react'
-import { TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native'
 
 import { FONT_REGULAR } from '../common/fonts'
 import { DISABLED_GRAY, WHITE } from '../common/colors'
@@ -23,7 +23,11 @@ const Button = ({ text, loading, disabled, onPress }: ButtonProps) => {
       disabled={disabled}
       onPress={onPress}
     >
-      <Text style={styles.text}>{text}</Text>
+      {
+        loading
+          ? <ActivityIndicator size='small' color={WHITE} />
+          : <Text style={styles.text}>{text}</Text>
+      }
     </TouchableOpacity>
   )
 }
@@ -31,6 +35,8 @@ const Button = ({ text, loading, disabled, onPress }: ButtonProps) => {
 const styles = StyleSheet.create({
   touchable: {
     minWidth: 130,
+    paddingLeft: 10,
+    paddingRight: 10,
     height: 45,
     borderRadius: 30,
     justifyContent: 'center',

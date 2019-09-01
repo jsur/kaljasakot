@@ -11,17 +11,31 @@ import Settings from './components/Settings'
 import Login from './components/Login'
 
 import { FONT_REGULAR } from './common/fonts'
+import { BEER_YELLOW, WHITE, BLACK } from './common/colors'
 
 const LoggedInNavigator = createBottomTabNavigator({
   AddBeer: AddBeer,
   Settings: Settings
+}, {
+  navigationOptions: {
+    headerLeft: null
+  },
+  initialRouteName: 'AddBeer',
+  tabBarOptions: {
+    activeTintColor: WHITE,
+    inactiveTintColor: BLACK,
+    activeBackgroundColor: BEER_YELLOW,
+    labelStyle: {
+      fontFamily: FONT_REGULAR
+    }
+  }
 })
 
 const LoginNavigator = createStackNavigator({
   Login: Login,
   LoggedIn: LoggedInNavigator
 }, {
-  initialRouteName: 'Login',
+  initialRouteName: 'LoggedIn',
   headerLayoutPreset: 'center',
   defaultNavigationOptions: {
     headerStyle: {

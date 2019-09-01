@@ -1,9 +1,16 @@
 import React, { ReactNode } from 'react'
 import { StyleSheet, KeyboardAvoidingView } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 
 import { APP_BACKGROUND } from '../common/colors'
 
-const PageContainer = ({ children, backgroundColor }: { children: ReactNode, backgroundColor: string }) => {
+interface PageContainerProps {
+  children: ReactNode,
+  backgroundColor: string,
+  gradientColors?: Array<string>
+}
+
+const PageContainer = ({ children, backgroundColor, gradientColors }: PageContainerProps) => {
     return (
         <KeyboardAvoidingView
           style={[
@@ -12,7 +19,11 @@ const PageContainer = ({ children, backgroundColor }: { children: ReactNode, bac
           ]}
           behavior='padding'
         >
-          { children }
+          {
+            gradientColors
+              ? <LinearGradient style={styles.gradient} colors={gradientColors}>{ children }</LinearGradient>
+              : children
+          }
         </KeyboardAvoidingView>
     )
 }
@@ -25,6 +36,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     zIndex: 1
+  },
+  gradient: {
+    flex: 1,
+    width: '100%',
+    position: 'relative',
+    zIndex: 2
   }
 })
 

@@ -4,7 +4,7 @@ import { NavigationInjectedProps } from 'react-navigation'
 import Svg, { Path } from 'react-native-svg'
 
 import PageContainer from './PageContainer'
-import LoginForm, { LoginFormInputs } from './LoginForm'
+import LoginForm from './LoginForm'
 import SvgBubble from './SvgBubble'
 
 import { BEER_YELLOW, WHITE } from '../common/colors'
@@ -79,6 +79,10 @@ class Login extends React.Component<NavigationInjectedProps> {
           })
         }
         <View style={styles.main}>
+          <View style={[styles.bubbleWrapper, { left: width / 1.8 }]}><SvgBubble width={30} height={30} /></View>
+          <View style={[styles.bubbleWrapper, { top: height / 3, left: 20 }]}><SvgBubble width={35} height={35} /></View>
+          <View style={[styles.bubbleWrapper, { top: height / 2, left: width / 3.2 }]}><SvgBubble width={35} height={35} /></View>
+          <View style={[styles.bubbleWrapper, { top: height / 3, left: width / 1.3 }]}><SvgBubble width={25} height={25} /></View>
           <View style={styles.loginFormWrapper}>
             <LoginForm
               errorMsg={errorMsg}
@@ -96,8 +100,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     width: '100%',
-    alignItems: 'center',
-    // justifyContent: 'center'
+    alignItems: 'center'
   },
   loginFormWrapper: {
     width: '80%',
@@ -105,6 +108,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: '10%'
+  },
+  bubbleWrapper: {
+    position: 'absolute'
   }
 })
 
