@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { FONT_REGULAR } from '../common/fonts'
-import { ACTION_RED } from '../common/colors'
+import { BLACK } from '../common/colors'
 
 const ErrorText = ({ text }: { text: string }) => {
   if (!text) return null
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: FONT_REGULAR,
     fontSize: 12,
-    color: ACTION_RED,
+    color: BLACK,
     marginBottom: '2%'
   }
 })

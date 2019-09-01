@@ -1,9 +1,13 @@
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { View, StyleSheet } from 'react-native'
 
 import InputField from './InputField'
 import Button from './Button'
+import ErrorText from './ErrorText'
+
+import { getAuthErrorString } from '../common/auth-helpers'
+import firebase from '../config/firebase'
 
 export interface LoginFormInputs {
   email: string,
@@ -11,22 +15,43 @@ export interface LoginFormInputs {
 }
 
 interface LoginFormProps {
-  onSubmit: () => LoginFormInputs
+  onSuccess: () => undefined
 }
 
-const LoginForm = ({ onSubmit }: LoginFormProps) => {
+const LoginForm = ({ onSuccess }: LoginFormProps) => {
+  const passwordRef: React.RefObject = React.createRef()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [loading, setLoading] = useState(false)
+  const login = useCallback(async () => {
+    if (loading) return
+    setLoading(true)
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password)
+      setLoading(false)
+      onSuccess()
+    } catch (error) {
+      console.log(error.code)
+      setErrorMsg(getAuthErrorString(error.code))
+      setLoading(false)
+    }
+  }, loading)
 
   return (
     <View style={styles.form}>
+      <ErrorText text={errorMsg} />
       <InputField
         placeholder='Email'
         returnKeyType='next'
-        autoFocus
+        autoFocus={true}
         value={email}
         autoCapitalize='none'
-        onChangeText={setEmail}
+        onSubmitEditing={() => passwordRef.current.focus()}
+        onChangeText={text => {
+          setErrorMsg('')
+          setEmail(text)
+        }}
       />
       <View style={styles.filler} />
       <InputField
@@ -35,13 +60,18 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
         autoFocus
         value={password}
         autoCapitalize='none'
-        onChangeText={setPassword}
+        givenRef={passwordRef}
+        onChangeText={text => {
+          setErrorMsg('')
+          setPassword(text)
+        }}
+        onSubmitEditing={login}
       />
       <View style={{ marginTop: '5%' }}>
         <Button
           text='Valmis'
           disabled={!email || !password}
-          onPress={() => onSubmit({email, password})} />
+          onPress={login} />
       </View>
     </View>
   )
@@ -49,14 +79,22 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
 
 const styles = StyleSheet.create({
   form: {
+    flex: 1,
     width: '100%',
-    height: '40%',
     justifyContent: 'center',
     alignItems: 'center'
   },
   filler: {
-    height: '5%'
+    height: 10
   }
 })
 
 export default LoginForm
+
+
+  /*
+  createUser = () => {
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(success => this.goToApp())
+    .catch(error => this.setState({ errorMsg: error.message }))
+  } */

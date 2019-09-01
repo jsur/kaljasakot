@@ -22,9 +22,15 @@ const LoginNavigator = createStackNavigator({
   LoggedIn: LoggedInNavigator
 }, {
   initialRouteName: 'Login',
+  headerLayoutPreset: 'center',
   defaultNavigationOptions: {
+    headerStyle: {
+      borderBottomColor: 'white',
+      elevation: 0
+    },
     headerTitleStyle: {
-      fontFamily: FONT_REGULAR
+      fontFamily: FONT_REGULAR,
+      fontWeight: '400'
     }
   }
 })

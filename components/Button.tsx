@@ -2,7 +2,7 @@ import React from 'react'
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
 
 import { FONT_REGULAR } from '../common/fonts'
-import { ACTION_RED, BLACK, DISABLED_GRAY, WHITE } from '../common/colors'
+import { DISABLED_GRAY, WHITE } from '../common/colors'
 
 interface ButtonProps {
   text: string,
@@ -16,15 +16,14 @@ const Button = ({ text, loading, disabled, onPress }: ButtonProps) => {
     <TouchableOpacity
       style={[
         styles.touchable,
-        { backgroundColor: disabled ? DISABLED_GRAY : ACTION_RED }
+        {
+          backgroundColor: disabled ? DISABLED_GRAY : 'transparent'
+        }
       ]}
       disabled={disabled}
       onPress={onPress}
     >
-      <Text style={[
-        styles.text,
-        { color: disabled ? WHITE : BLACK }
-      ]}>{text}</Text>
+      <Text style={styles.text}>{text}</Text>
     </TouchableOpacity>
   )
 }
@@ -32,15 +31,17 @@ const Button = ({ text, loading, disabled, onPress }: ButtonProps) => {
 const styles = StyleSheet.create({
   touchable: {
     minWidth: 130,
-    height: 50,
+    height: 45,
     borderRadius: 30,
-    backgroundColor: ACTION_RED,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    borderColor: WHITE,
+    borderWidth: 2
   },
   text: {
     fontFamily: FONT_REGULAR,
-    fontSize: 16
+    fontSize: 16,
+    color: WHITE
   }
 })
 
