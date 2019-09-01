@@ -35,9 +35,10 @@ const LoginNavigator = createStackNavigator({
   Login: Login,
   LoggedIn: LoggedInNavigator
 }, {
-  initialRouteName: 'LoggedIn',
+  initialRouteName: 'Login',
   headerLayoutPreset: 'center',
   defaultNavigationOptions: {
+    title: 'Kaljasakot',
     headerStyle: {
       borderBottomColor: 'white',
       elevation: 0

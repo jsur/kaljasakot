@@ -35,8 +35,8 @@ const Button = ({ text, loading, disabled, onPress }: ButtonProps) => {
 const styles = StyleSheet.create({
   touchable: {
     minWidth: 130,
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
     height: 45,
     borderRadius: 30,
     justifyContent: 'center',

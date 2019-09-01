@@ -15,10 +15,6 @@ class Login extends React.Component<NavigationInjectedProps> {
   bubbles = null
   bubbleInterval = null
 
-  static navigationOptions = {
-    title: 'Kaljasakot'
-  }
-
   state = {
     errorMsg: ''
   }
