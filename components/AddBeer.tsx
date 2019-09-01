@@ -1,5 +1,5 @@
 import React from 'react'
-import { ActivityIndicator, StyleSheet, View, Text } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, View, Text } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 
 import PageContainer from './PageContainer'
@@ -41,15 +41,7 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
 
   state = {
     loading: false,
-    teams: [
-      {
-        admins: [],
-        logo_url: '',
-        name: '',
-        penalties: {},
-        players: []
-      }
-    ]
+    teams: []
   }
 
   async componentDidMount () {
@@ -96,11 +88,14 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
       <PageContainer>
         <View style={styles.main}>
           {
-            loading
+            loading || !team
               ? <ActivityIndicator size='large' color={BEER_YELLOW} />
               : (
                 <>
-                  <Text style={styles.teamName}>{team.name}</Text>
+                  <View style={styles.teamWrapper}>
+                    { team.logo_url && <Image source={{ uri: team.logo_url }} style={styles.teamLogo} resizeMode='contain' /> }
+                    <Text style={styles.teamName}>{team.name}</Text>
+                  </View>
                   <TeamPenaltyList players={team.players} teamId={team.id} />
                 </>
               )
@@ -119,10 +114,22 @@ const styles = StyleSheet.create({
     backgroundColor: LOGGEDIN_BACKGROUND,
     paddingTop: '5%'
   },
+  teamWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%'
+  },
   teamName: {
     fontFamily: FONT_REGULAR,
     fontSize: 26,
     color: WHITE
+  },
+  teamLogo: {
+    width: 100,
+    height: 100,
+    position: 'absolute',
+    left: 0
   }
 })
 
