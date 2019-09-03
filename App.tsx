@@ -9,8 +9,9 @@ import * as Font from 'expo-font'
 import AddBeer from './components/AddBeer'
 import Settings from './components/Settings'
 import Login from './components/Login'
+import CreateChoice from './components/CreateChoice'
 
-import { FONT_REGULAR } from './common/fonts'
+import { FONT_LIGHT, FONT_REGULAR, FONT_MEDIUM } from './common/fonts'
 import { BEER_YELLOW, WHITE, BLACK } from './common/colors'
 
 const LoggedInNavigator = createBottomTabNavigator({
@@ -33,6 +34,7 @@ const LoggedInNavigator = createBottomTabNavigator({
 
 const LoginNavigator = createStackNavigator({
   Login: Login,
+  CreateChoice: CreateChoice,
   LoggedIn: LoggedInNavigator
 }, {
   initialRouteName: 'Login',
@@ -59,7 +61,9 @@ class App extends React.Component {
 
   async componentDidMount () {
     await Font.loadAsync({
-      [FONT_REGULAR]: require('./assets/fonts/roboto-regular.ttf')
+      [FONT_LIGHT]: require('./assets/fonts/roboto-light.ttf'),
+      [FONT_REGULAR]: require('./assets/fonts/roboto-regular.ttf'),
+      [FONT_MEDIUM]: require('./assets/fonts/roboto-medium.ttf')
     })
     this.setState({ ready: true })
   }

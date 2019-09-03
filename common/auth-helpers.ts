@@ -2,7 +2,8 @@ import { StackActions, NavigationActions, NavigationScreenProp } from 'react-nav
 
 export const getAuthErrorString = (code: string) => {
   switch (code) {
-    case 'auth/invalid-email': return 'Tarkista sähköposti'
+    case 'auth/invalid-email':
+    case 'auth/user-not-found': return 'Tarkista sähköposti ja salasana'
     default: return 'Virhe kirjautumisessa'
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Animated, StyleSheet, View, Dimensions } from 'react-native'
+import { Animated, StyleSheet, View, Dimensions, Text, TouchableOpacity } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import Svg, { Path } from 'react-native-svg'
 
@@ -8,6 +8,7 @@ import LoginForm from './LoginForm'
 import SvgBubble from './SvgBubble'
 
 import { BEER_YELLOW, WHITE } from '../common/colors'
+import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts';
 
 const { width, height } = Dimensions.get('window')
 
@@ -51,6 +52,9 @@ class Login extends React.Component<NavigationInjectedProps> {
         delay: Math.random() * 6000
       }).start()
   }
+
+  goTo = (to: string) => this.props.navigation.navigate(to)
+
   render() {
     const { errorMsg } = this.state
     const ds = [
@@ -82,9 +86,15 @@ class Login extends React.Component<NavigationInjectedProps> {
           <View style={styles.loginFormWrapper}>
             <LoginForm
               errorMsg={errorMsg}
-              onSuccess={() => this.props.navigation.navigate('AddBeer')}
+              onSuccess={() => this.goTo('AddBeer')}
             />
           </View>
+          <TouchableOpacity
+            style={{ padding: 10 }}
+            onPress={() => this.goTo('CreateChoice')}
+          >
+              <Text style={styles.newUserText}>Luo uusi käyttäjä tai joukkue</Text>
+            </TouchableOpacity>
         </View>
       </PageContainer>
       </>
@@ -100,13 +110,18 @@ const styles = StyleSheet.create({
   },
   loginFormWrapper: {
     width: '80%',
-    height: '45%',
+    height: '60%',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: '10%'
   },
   bubbleWrapper: {
     position: 'absolute'
+  },
+  newUserText: {
+    fontFamily: FONT_MEDIUM,
+    fontSize: 16,
+    color: WHITE
   }
 })
 

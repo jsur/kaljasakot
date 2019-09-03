@@ -62,6 +62,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
         value={password}
         autoCapitalize='none'
         givenRef={passwordRef}
+        secureTextEntry
         onChangeText={text => {
           setErrorMsg('')
           setPassword(text)

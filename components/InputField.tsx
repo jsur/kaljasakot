@@ -13,6 +13,7 @@ interface InputFieldProps {
   value: string,
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'
   givenRef?: React.RefObject,
+  secureTextEntry?: boolean,
   onChange: () => void,
   onSubmitEditing: () => void
 }
@@ -24,6 +25,7 @@ const InputField = ({
   value,
   autoCapitalize,
   givenRef,
+  secureTextEntry,
   onChangeText,
   onSubmitEditing
 }: InputFieldProps) => {
@@ -36,6 +38,7 @@ const InputField = ({
       autoCapitalize={autoCapitalize}
       autoCorrect={false}
       ref={givenRef}
+      secureTextEntry={secureTextEntry}
       onSubmitEditing={onSubmitEditing}
       onChangeText={text => onChangeText(text)}
     />

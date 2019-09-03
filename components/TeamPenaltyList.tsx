@@ -68,7 +68,7 @@ class TeamPenaltyList extends React.Component<Props, State> {
     const { playersWithPenalties } = this.state
     return (
       <View style={styles.main}>
-        <Text style={styles.header}>Sakkoja nyt:</Text>
+        <Text style={styles.header}>Jaetut sakot:</Text>
         <FlatList
           data={playersWithPenalties}
           keyExtractor={item => `${item.username}-${item.penalties}`}
