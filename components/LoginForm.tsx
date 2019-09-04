@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
 
 import InputField from './InputField'
@@ -7,6 +7,7 @@ import Button from './Button'
 import ErrorText from './ErrorText'
 
 import { getAuthErrorString } from '../common/auth-helpers'
+import { storeData, retrieveData } from '../common/asyncStorage'
 import firebase from '../config/firebase'
 
 export interface LoginFormInputs {
@@ -25,14 +26,20 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    retrieveData('email').then(previousEmail => setEmail(previousEmail || ''))
+  }, [])
+
   const login = useCallback(async (email: string, password: string) => {
     if (loading) return
     setLoading(true)
     try {
       await firebase.auth().signInWithEmailAndPassword(email, password)
+      await storeData('email', email)
       setLoading(false)
       onSuccess()
     } catch (error) {
+      console.log(error)
       console.log(error.code)
       setErrorMsg(getAuthErrorString(error.code))
       setLoading(false)
@@ -43,9 +50,9 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
     <View style={styles.form}>
       <ErrorText text={errorMsg} />
       <InputField
-        placeholder='Email'
+        placeholder='Sähköposti'
         returnKeyType='next'
-        autoFocus={true}
+        autoFocus
         value={email}
         autoCapitalize='none'
         onSubmitEditing={() => passwordRef.current.focus()}
@@ -58,7 +65,6 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
       <InputField
         placeholder='Salasana'
         returnKeyType='done'
-        autoFocus
         value={password}
         autoCapitalize='none'
         givenRef={passwordRef}
@@ -73,7 +79,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
         <Button
           text='Valmis'
           loading={loading}
-          disabled={loading || !email || !password}
+          disabled={loading || !email || !password || password.length < 6}
           onPress={() => login(email, password)} />
       </View>
     </View>

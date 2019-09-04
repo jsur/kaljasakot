@@ -91,9 +91,9 @@ class Login extends React.Component<NavigationInjectedProps> {
           </View>
           <TouchableOpacity
             style={{ padding: 10 }}
-            onPress={() => this.goTo('CreateChoice')}
+            onPress={() => this.goTo('NewUser')}
           >
-              <Text style={styles.newUserText}>Luo uusi käyttäjä tai joukkue</Text>
+              <Text style={styles.newUserText}>Luo uusi käyttäjä</Text>
             </TouchableOpacity>
         </View>
       </PageContainer>

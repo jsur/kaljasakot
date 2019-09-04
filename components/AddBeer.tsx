@@ -1,5 +1,13 @@
 import React from 'react'
-import { ActivityIndicator, Image, StyleSheet, View, Text } from 'react-native'
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity
+} from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 
 import PageContainer from './PageContainer'
@@ -7,10 +15,10 @@ import TabBarIcon from './TabBarIcon'
 import TeamPenaltyList from './TeamPenaltyList'
 
 import { clearNavigationStack } from '../common/auth-helpers'
-import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
-import { FONT_REGULAR } from '../common/fonts'
+import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW, BLACK, LOGGEDIN_BACKGROUND_LIGHT } from '../common/colors'
+import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts'
 
-import firebase from '../config/firebase'
+import { db, auth } from '../config/firebase'
 
 interface Team {
   id: string,
@@ -25,7 +33,8 @@ interface Team {
 
 interface State {
   loading: false,
-  teams: Array<Team>
+  teams: Array<Team>,
+  allTeams: Array<Team>
 }
 
 class AddBeer extends React.Component<NavigationInjectedProps, State> {
@@ -41,37 +50,34 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
 
   state = {
     loading: false,
-    teams: []
+    teams: [],
+    allTeams: []
   }
 
   async componentDidMount () {
-    if (!firebase.auth().currentUser) {
+    if (!auth.currentUser) {
       clearNavigationStack(this.props.navigation)
     }
-    await this.getTeam()
+    await this.getOwnTeams()
+    if (this.state.teams.length === 0) {
+      await this.getAllTeams()
+    }
   }
 
   getPlayer = async (): string | undefined => {
     try {
-      const snapshot = await firebase.firestore()
-        .collection('player')
-        .where('auth_id', '==', firebase.auth().currentUser.uid)
-        .get()
-      
+      const snapshot = await db.collection('player').where('auth_id', '==', auth.currentUser.uid).get()
       return snapshot.docs.length > 0 && snapshot.docs[0].id
     } catch (error) {
       console.log(error)
     }
   }
 
-  getTeam = async () => {
+  getOwnTeams = async () => {
     try {
       this.setState({ loading: true })
       const playerId = await this.getPlayer()
-      const snapshot = await firebase.firestore()
-        .collection('team')
-        .where('players', 'array-contains', playerId)
-        .get()
+      const snapshot = await db.collection('team').where('players', 'array-contains', playerId).get()
       const teams = []
       snapshot.forEach(doc => teams.push({ ...doc.data(), id: doc.id }))
       this.setState({ teams, loading: false })
@@ -81,15 +87,69 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
     }
   }
 
+  getAllTeams = async () => {
+    try {
+      this.setState({ loading: true })
+      const snapshot = await db.collection('team').get()
+      const allTeams = []
+      snapshot.forEach(doc => allTeams.push({ ...doc.data(), id: doc.id }))
+      this.setState({ allTeams, loading: false })
+    } catch (error) {
+      console.log(error)
+      this.setState({ loading: false })
+    }
+  }
+
+  onTeamPress = async (team: Team) => {
+    this.setState({ loading: true })
+    try {
+      const playerId = await this.getPlayer()
+      const newPlayers = [...team.players, playerId]
+      await db.collection('team').doc(team.id).update({ players: newPlayers })
+      await this.getOwnTeams()
+      this.setState({ loading: false })
+    } catch (error) {
+      console.log(error)
+      this.setState({ loading: false })
+    }
+  }
+
   render() {
-    const { teams, loading } = this.state
+    const { allTeams, teams, loading } = this.state
     const team = teams[0]
     return (
       <PageContainer>
         <View style={styles.main}>
           {
-            loading || !team
+            loading
               ? <ActivityIndicator size='large' color={BEER_YELLOW} />
+              : teams.length === 0 ? (
+                <View style={styles.noTeamWrapper}>
+                  <Text style={styles.noTeamText}>Et ole vielä liittynyt</Text>
+                  <Text style={styles.noTeamText}>mihinkään joukkueeseen.</Text>
+                  <Text style={[styles.noTeamText, { marginTop: '2%' }]}>Valitse joku alla olevista tai luo uusi!</Text>
+                  <View style={styles.listWrapper}>
+                    <FlatList
+                      style={{ width: '100%', height: '80%' }}
+                      data={allTeams}
+                      keyExtractor={item => item.id}
+                      ItemSeparatorComponent={<View style={styles.listSeparator} />}
+                      renderItem={data => {
+                        return (
+                          <TouchableOpacity
+                            disabled={loading}
+                            style={styles.teamRow}
+                            onPress={() => this.onTeamPress(data.item)}
+                          >
+                            <Image source={{ uri: data.item.logo_url }} style={styles.teamRowLogo} resizeMode='contain' />
+                            <Text style={styles.teamRowText}>{data.item.name}</Text>
+                          </TouchableOpacity>
+                        )
+                      }}
+                    />
+                  </View>
+                </View>
+              )
               : (
                 <>
                   <View style={styles.teamWrapper}>
@@ -113,6 +173,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: LOGGEDIN_BACKGROUND,
     paddingTop: '5%'
+  },
+  noTeamWrapper: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center'
+  },
+  noTeamText: {
+    fontFamily: FONT_REGULAR,
+    fontSize: 14,
+    color: WHITE,
+    textAlign: 'center'
+  },
+  listWrapper: {
+    flex: 1,
+    width: '80%',
+    alignItems: 'center',
+    marginTop: '10%'
+  },
+  listSeparator: {
+    borderBottomColor: BEER_YELLOW,
+    borderWidth: 1
+  },
+  teamRow: {
+    width: '100%',
+    height: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  teamRowText: {
+    fontFamily: FONT_MEDIUM,
+    fontSize: 16,
+    color: BLACK
+  },
+  teamRowLogo: {
+    width: 45,
+    height: 45
   },
   teamWrapper: {
     flexDirection: 'row',

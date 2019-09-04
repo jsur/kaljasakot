@@ -35,6 +35,7 @@ const InputField = ({
       value={value}
       placeholder={placeholder}
       returnKeyType={returnKeyType}
+      autoFocus={autoFocus}
       autoCapitalize={autoCapitalize}
       autoCorrect={false}
       ref={givenRef}

@@ -9,7 +9,7 @@ import * as Font from 'expo-font'
 import AddBeer from './components/AddBeer'
 import Settings from './components/Settings'
 import Login from './components/Login'
-import CreateChoice from './components/CreateChoice'
+import NewUser from './components/NewUser'
 
 import { FONT_LIGHT, FONT_REGULAR, FONT_MEDIUM } from './common/fonts'
 import { BEER_YELLOW, WHITE, BLACK } from './common/colors'
@@ -34,7 +34,7 @@ const LoggedInNavigator = createBottomTabNavigator({
 
 const LoginNavigator = createStackNavigator({
   Login: Login,
-  CreateChoice: CreateChoice,
+  NewUser: NewUser,
   LoggedIn: LoggedInNavigator
 }, {
   initialRouteName: 'Login',
