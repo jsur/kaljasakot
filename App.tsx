@@ -10,6 +10,7 @@ import AddBeer from './components/AddBeer'
 import Settings from './components/Settings'
 import Login from './components/Login'
 import NewUser from './components/NewUser'
+import NewTeam from './components/NewTeam'
 
 import { FONT_LIGHT, FONT_REGULAR, FONT_MEDIUM } from './common/fonts'
 import { BEER_YELLOW, WHITE, BLACK } from './common/colors'

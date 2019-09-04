@@ -13,6 +13,7 @@ import { NavigationInjectedProps } from 'react-navigation'
 import PageContainer from './PageContainer'
 import TabBarIcon from './TabBarIcon'
 import TeamPenaltyList from './TeamPenaltyList'
+import Button from './Button'
 
 import { clearNavigationStack } from '../common/auth-helpers'
 import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW, BLACK, LOGGEDIN_BACKGROUND_LIGHT } from '../common/colors'
@@ -133,7 +134,7 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
                       style={{ width: '100%', height: '80%' }}
                       data={allTeams}
                       keyExtractor={item => item.id}
-                      ItemSeparatorComponent={<View style={styles.listSeparator} />}
+                      ItemSeparatorComponent={() => <View style={styles.listSeparator} />}
                       renderItem={data => {
                         return (
                           <TouchableOpacity
@@ -147,6 +148,9 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
                         )
                       }}
                     />
+                  </View>
+                  <View style={styles.newTeamButtonWrapper}>
+                    <Button text='Luo uusi joukkue' onPress={() => {}} />
                   </View>
                 </View>
               )
@@ -197,19 +201,27 @@ const styles = StyleSheet.create({
   },
   teamRow: {
     width: '100%',
-    height: 50,
+    height: 55,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center'
   },
   teamRowText: {
     fontFamily: FONT_MEDIUM,
-    fontSize: 16,
-    color: BLACK
+    fontSize: 18,
+    color: WHITE
   },
   teamRowLogo: {
+    position: 'absolute',
+    left: '5%',
     width: 45,
     height: 45
+  },
+  newTeamButtonWrapper: {
+    width: '100%',
+    height: '15%',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   teamWrapper: {
     flexDirection: 'row',
@@ -223,10 +235,10 @@ const styles = StyleSheet.create({
     color: WHITE
   },
   teamLogo: {
-    width: 100,
-    height: 100,
+    width: 50,
+    height: 50,
     position: 'absolute',
-    left: 0
+    left: '5%'
   }
 })
 
