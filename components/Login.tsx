@@ -8,11 +8,13 @@ import LoginForm from './LoginForm'
 import SvgBubble from './SvgBubble'
 
 import { BEER_YELLOW, WHITE } from '../common/colors'
-import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts';
+import { FONT_MEDIUM } from '../common/fonts'
 
 const { width, height } = Dimensions.get('window')
 
 class Login extends React.Component<NavigationInjectedProps> {
+  willFocusListener = null
+  willBlurListener = null
   bubbles = null
   bubbleInterval = null
 
@@ -21,12 +23,20 @@ class Login extends React.Component<NavigationInjectedProps> {
   }
 
   componentDidMount () {
-    this.initBubbles()
-    this.bubbleInterval = setInterval(() => this.initBubbles(), 12000)
+    const { navigation } = this.props
+    this.willFocusListener = navigation.addListener('willFocus', () => {
+      this.initBubbles()
+      this.bubbleInterval = setInterval(() => this.initBubbles(), 12000)
+    })
+    this.willBlurListener = navigation.addListener('willBlur', () => {
+      clearInterval(this.bubbleInterval)
+    })
   }
 
   componentWillUnmount () {
     clearInterval(this.bubbleInterval)
+    this.willFocusListener.remove()
+    this.willBlurListener.remove()
   }
 
   initBubbles = () => {

@@ -16,10 +16,11 @@ import TeamPenaltyList from './TeamPenaltyList'
 import Button from './Button'
 
 import { clearNavigationStack } from '../common/auth-helpers'
-import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW, BLACK, LOGGEDIN_BACKGROUND_LIGHT } from '../common/colors'
+import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
 import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts'
 
 import { db, auth } from '../config/firebase'
+import { getPlayer } from '../common/firebase-helpers'
 
 interface Team {
   id: string,
@@ -65,19 +66,10 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
     }
   }
 
-  getPlayer = async (): string | undefined => {
-    try {
-      const snapshot = await db.collection('player').where('auth_id', '==', auth.currentUser.uid).get()
-      return snapshot.docs.length > 0 && snapshot.docs[0].id
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   getOwnTeams = async () => {
     try {
       this.setState({ loading: true })
-      const playerId = await this.getPlayer()
+      const playerId = await getPlayer()
       const snapshot = await db.collection('team').where('players', 'array-contains', playerId).get()
       const teams = []
       snapshot.forEach(doc => teams.push({ ...doc.data(), id: doc.id }))
@@ -104,7 +96,7 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
   onTeamPress = async (team: Team) => {
     this.setState({ loading: true })
     try {
-      const playerId = await this.getPlayer()
+      const playerId = await getPlayer()
       const newPlayers = [...team.players, playerId]
       await db.collection('team').doc(team.id).update({ players: newPlayers })
       await this.getOwnTeams()
@@ -150,7 +142,7 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
                     />
                   </View>
                   <View style={styles.newTeamButtonWrapper}>
-                    <Button text='Luo uusi joukkue' onPress={() => {}} />
+                    <Button text='Luo uusi joukkue' onPress={() => this.props.navigation.navigate('NewTeam')} />
                   </View>
                 </View>
               )

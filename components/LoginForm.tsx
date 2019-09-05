@@ -52,8 +52,8 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
       <InputField
         placeholder='Sähköposti'
         returnKeyType='next'
-        autoFocus
         value={email}
+        autoFocus
         autoCapitalize='none'
         onSubmitEditing={() => passwordRef.current.focus()}
         onChangeText={text => {

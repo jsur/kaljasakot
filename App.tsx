@@ -11,18 +11,38 @@ import Settings from './components/Settings'
 import Login from './components/Login'
 import NewUser from './components/NewUser'
 import NewTeam from './components/NewTeam'
+import TabBarIcon from './components/TabBarIcon'
 
 import { FONT_LIGHT, FONT_REGULAR, FONT_MEDIUM } from './common/fonts'
 import { BEER_YELLOW, WHITE, BLACK } from './common/colors'
 
+console.disableYellowBox = true
+
+const firstTabButtonNavigator = createStackNavigator({
+  AddBeer,
+  NewTeam
+})
+
 const LoggedInNavigator = createBottomTabNavigator({
-  AddBeer: AddBeer,
+  firstTab: {
+    screen: firstTabButtonNavigator,
+    navigationOptions: {
+      title: 'Sakot',
+      tabBarIcon: ({ focused }) => {
+        return <TabBarIcon imgSrc={focused
+          ? require('./assets/images/jar-of-beer-white.png')
+          : require('./assets/images/jar-of-beer-black.png')}
+        />
+      }
+    }
+  },
   Settings: Settings
 }, {
   navigationOptions: {
+    header: null,
     headerLeft: null
   },
-  initialRouteName: 'AddBeer',
+  initialRouteName: 'firstTab',
   tabBarOptions: {
     activeTintColor: WHITE,
     inactiveTintColor: BLACK,

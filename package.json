@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "expo": "^34.0.1",
+    "expo-document-picker": "~6.0.0",
     "expo-font": "~6.0.1",
     "expo-linear-gradient": "~6.0.0",
     "firebase": "^6.5.0",
