@@ -3,6 +3,6 @@
 
 ### Icon credits
 
-Jar of beer: https://www.flaticon.com/authors/freepik
+Jar of beer: https://www.flaticon.com/authors/freepik  
 Settings: https://www.flaticon.com/authors/gregor-cresnar
 
