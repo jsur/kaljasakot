@@ -9,9 +9,11 @@ import InputField from './InputField'
 import ErrorText from './ErrorText'
 
 import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
-import { auth, db, storage } from '../config/firebase'
+import { db, storage } from '../config/firebase'
 import { getPlayer } from '../common/firebase-helpers'
 import { FONT_REGULAR } from '../common/fonts'
+
+const ERROR_PHOTO = 'Virhe tallennettaessa kuvaa'
 
 interface State {
   loading: boolean,
@@ -38,39 +40,46 @@ class NewTeam extends React.Component<NavigationInjectedProps, State> {
 
   uploadPhoto = async () => {
     try {
-      this.setState({ loading: true })
       const { logoUri, logoName } = this.state
+      if (!logoUri) return
       const contentType = `image/${logoUri.slice(logoUri.lastIndexOf('.') + 1)}`
       const res = await fetch(logoUri)
       const blob = await res.blob()
-      storage.ref().child(logoName).put(blob, { contentType })
-        .then(snapshot => {
-          snapshot.ref.getDownloadURL()
-            .then(url => this.createTeam(url))
-            .catch(error => this.showError('Virhe tallennettaessa kuvaa'))
-        })
-        .catch(error => this.showError('Virhe tallennettaessa kuvaa'))
+      const snapshot = await storage.ref().child(logoName).put(blob, { contentType })
+      const url: string = await snapshot.ref.getDownloadURL()
+      return url
     } catch (error) {
       console.log(error)
-      this.showError('Virhe tallennettaessa kuvaa')
+      throw new Error(ERROR_PHOTO)
     }
   }
 
-  createTeam = async (url: string) => {
+  createTeam = async (logoUrl: string | undefined) => {
     try {
       const { teamName } = this.state
       const playerId = await getPlayer()
       await db.collection('team').add({
-        logo_url: url,
+        logo_url: logoUrl || 'https://firebasestorage.googleapis.com/v0/b/kaljasakot.appspot.com/o/questions-circular-button.png?alt=media&token=0fcb0852-cc21-4e82-bc0c-af6969e3f5df',
         name: teamName,
         admins: [ playerId ],
         players: [ playerId ]
       })
-      this.setState({ loading: false })
-      this.props.navigation.navigate('AddBeer')
     } catch (error) {
       console.log(error)
-      this.showError('Virhe luodessa joukkuetta')
+      throw new Error('Virhe luodessa joukkuetta')
+    }
+  }
+
+  onSubmit = async () => {
+    try {
+      this.setState({ loading: true })
+      const url = await this.uploadPhoto()
+      await this.createTeam(url)
+      this.setState({ loading: false }, () => {
+        this.props.navigation.navigate('Landing')
+      })
+    } catch (error) {
+      this.setState({ errorMsg: error.message, loading: false })
     }
   }
 
@@ -115,7 +124,7 @@ class NewTeam extends React.Component<NavigationInjectedProps, State> {
                 disabled={!teamName}
                 text='Perusta joukkue'
                 loading={loading}
-                onPress={this.createTeam}
+                onPress={this.onSubmit}
               />
             </View>
           </View>

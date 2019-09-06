@@ -41,7 +41,7 @@ const NewUser = (props: NavigationInjectedProps) => {
         team_penalties: {}
       })
       setLoading(false)
-      props.navigation.navigate('AddBeer')
+      props.navigation.navigate('Landing')
       
     } catch (error) {
       console.log(error)

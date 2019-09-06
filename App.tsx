@@ -6,21 +6,25 @@ import {
 } from 'react-navigation'
 import * as Font from 'expo-font'
 
-import AddBeer from './components/AddBeer'
+import Landing from './components/Landing'
 import Settings from './components/Settings'
 import Login from './components/Login'
 import NewUser from './components/NewUser'
 import NewTeam from './components/NewTeam'
 import TabBarIcon from './components/TabBarIcon'
+import GivePenalty from './components/GivePenalty'
 
 import { FONT_LIGHT, FONT_REGULAR, FONT_MEDIUM } from './common/fonts'
 import { BEER_YELLOW, WHITE, BLACK } from './common/colors'
 
+import AppState from './AppState'
+
 console.disableYellowBox = true
 
 const firstTabButtonNavigator = createStackNavigator({
-  AddBeer,
-  NewTeam
+  Landing,
+  NewTeam,
+  GivePenalty
 })
 
 const LoggedInNavigator = createBottomTabNavigator({
@@ -94,7 +98,9 @@ class App extends React.Component {
       return null
     }
     return (
-      <AppContainer />
+      <AppState>
+        <AppContainer />
+      </AppState>
     )
   }
 }

@@ -8,3 +8,12 @@ export const getPlayer = async (): string | undefined => {
     console.log(error)
   }
 }
+
+export const getOwnTeam = async () => {
+  const playerId = await getPlayer()
+  const snapshot = await db.collection('team').where('players', 'array-contains', playerId).get()
+  // multiple teams later?
+  const teams = []
+  snapshot.forEach(doc => teams.push({ ...doc.data(), id: doc.id }))
+  return teams[0]
+}

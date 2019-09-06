@@ -8,7 +8,7 @@ import {
   FlatList,
   TouchableOpacity
 } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
+import { NavigationInjectedProps, NavigationEventSubscription } from 'react-navigation'
 
 import PageContainer from './PageContainer'
 import TabBarIcon from './TabBarIcon'
@@ -20,26 +20,21 @@ import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
 import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts'
 
 import { db, auth } from '../config/firebase'
-import { getPlayer } from '../common/firebase-helpers'
+import { getPlayer, getOwnTeam } from '../common/firebase-helpers'
+import { withAppState, AppStateType } from '../AppState'
+import { Team } from '../common/types'
 
-interface Team {
-  id: string,
-  admins: Array<string>,
-  logo_url: string,
-  name: string,
-  penalties: {
-    [uid: string]: number
-  },
-  players: Array<string>
+interface Props {
+  appState: AppStateType
 }
 
 interface State {
   loading: false,
-  teams: Array<Team>,
   allTeams: Array<Team>
 }
 
-class AddBeer extends React.Component<NavigationInjectedProps, State> {
+class Landing extends React.Component<NavigationInjectedProps & Props, State> {
+  willFocusListener: NavigationEventSubscription = null
   static navigationOptions = {
     title: 'Sakot',
     tabBarIcon: ({ focused }) => {
@@ -52,41 +47,39 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
 
   state = {
     loading: false,
-    teams: [],
     allTeams: []
   }
 
-  async componentDidMount () {
+  componentDidMount () {
+    const { appState, navigation } = this.props
     if (!auth.currentUser) {
-      clearNavigationStack(this.props.navigation)
+      clearNavigationStack(navigation)
     }
-    await this.getOwnTeams()
-    if (this.state.teams.length === 0) {
-      await this.getAllTeams()
-    }
+    this.willFocusListener = navigation.addListener('willFocus', async () => {
+      this.setState({ loading: true })
+      await this.refreshOwnTeam()
+      if (!appState.currentTeam) {
+        await this.getAllTeams()
+      }
+      this.setState({ loading: false })
+    })
   }
 
-  getOwnTeams = async () => {
-    try {
-      this.setState({ loading: true })
-      const playerId = await getPlayer()
-      const snapshot = await db.collection('team').where('players', 'array-contains', playerId).get()
-      const teams = []
-      snapshot.forEach(doc => teams.push({ ...doc.data(), id: doc.id }))
-      this.setState({ teams, loading: false })
-    } catch (error) {
-      console.log(error)
-      this.setState({ loading: false })
-    }
+  componentWillUnmount () {
+    this.willFocusListener && this.willFocusListener.remove()
+  }
+
+  refreshOwnTeam = async () => {
+    const ownTeam = await getOwnTeam()
+    this.props.appState.updateAppState({ currentTeam: ownTeam })
   }
 
   getAllTeams = async () => {
     try {
-      this.setState({ loading: true })
       const snapshot = await db.collection('team').get()
       const allTeams = []
       snapshot.forEach(doc => allTeams.push({ ...doc.data(), id: doc.id }))
-      this.setState({ allTeams, loading: false })
+      this.setState({ allTeams })
     } catch (error) {
       console.log(error)
       this.setState({ loading: false })
@@ -94,13 +87,11 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
   }
 
   onTeamPress = async (team: Team) => {
-    this.setState({ loading: true })
     try {
       const playerId = await getPlayer()
       const newPlayers = [...team.players, playerId]
       await db.collection('team').doc(team.id).update({ players: newPlayers })
-      await this.getOwnTeams()
-      this.setState({ loading: false })
+      await this.refreshOwnTeam()
     } catch (error) {
       console.log(error)
       this.setState({ loading: false })
@@ -108,15 +99,16 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
   }
 
   render() {
-    const { allTeams, teams, loading } = this.state
-    const team = teams[0]
+    const { allTeams, loading } = this.state
+    const { currentTeam } = this.props.appState
+    console.log('rendered!!!')
     return (
       <PageContainer>
         <View style={styles.main}>
           {
             loading
               ? <ActivityIndicator size='large' color={BEER_YELLOW} />
-              : teams.length === 0 ? (
+              : !currentTeam ? (
                 <View style={styles.noTeamWrapper}>
                   <Text style={styles.noTeamText}>Et ole vielä liittynyt</Text>
                   <Text style={styles.noTeamText}>mihinkään joukkueeseen.</Text>
@@ -149,10 +141,10 @@ class AddBeer extends React.Component<NavigationInjectedProps, State> {
               : (
                 <>
                   <View style={styles.teamWrapper}>
-                    { team.logo_url && <Image source={{ uri: team.logo_url }} style={styles.teamLogo} resizeMode='contain' /> }
-                    <Text style={styles.teamName}>{team.name}</Text>
+                    { currentTeam.logo_url && <Image source={{ uri: currentTeam.logo_url }} style={styles.teamLogo} resizeMode='contain' /> }
+                    <Text style={styles.teamName}>{currentTeam.name}</Text>
                   </View>
-                  <TeamPenaltyList players={team.players} teamId={team.id} />
+                  <TeamPenaltyList players={currentTeam.players} teamId={currentTeam.id} />
                 </>
               )
           }
@@ -234,4 +226,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default AddBeer
+export default withAppState(Landing)

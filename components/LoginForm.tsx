@@ -55,6 +55,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
         value={email}
         autoFocus
         autoCapitalize='none'
+        keyboardType='email-address'
         onSubmitEditing={() => passwordRef.current.focus()}
         onChangeText={text => {
           setErrorMsg('')

@@ -96,7 +96,7 @@ class Login extends React.Component<NavigationInjectedProps> {
           <View style={styles.loginFormWrapper}>
             <LoginForm
               errorMsg={errorMsg}
-              onSuccess={() => this.goTo('AddBeer')}
+              onSuccess={() => this.goTo('Landing')}
             />
           </View>
           <TouchableOpacity

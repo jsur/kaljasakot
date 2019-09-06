@@ -1,5 +1,8 @@
 import React from 'react'
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
+import { withNavigation, NavigationInjectedProps } from 'react-navigation'
+
+import Button from './Button'
 
 import firebase from '../config/firebase'
 import { WHITE, BEER_YELLOW } from '../common/colors'
@@ -25,14 +28,14 @@ interface State {
   }>
 }
 
-class TeamPenaltyList extends React.Component<Props, State> {
+class TeamPenaltyList extends React.Component<NavigationInjectedProps & Props, State> {
   state = {
     playersWithPenalties: []
   }
   
   componentDidMount() {
     if (this.props.players.length > 0) {
-      this.populateState()
+      // this.populateState()
     }
   }
 
@@ -66,26 +69,44 @@ class TeamPenaltyList extends React.Component<Props, State> {
 
   render() {
     const { playersWithPenalties } = this.state
+    const { navigation } = this.props
     return (
       <View style={styles.main}>
         <Text style={styles.header}>Jaetut sakot:</Text>
-        <FlatList
-          data={playersWithPenalties}
-          keyExtractor={item => `${item.username}-${item.penalties}`}
-          ItemSeparatorComponent={() => {
-            return <View style={{ borderColor: BEER_YELLOW, borderWidth: StyleSheet.hairlineWidth }} />
-          }}
-          renderItem={data => {
-            return (
-              <TouchableOpacity
-                style={styles.penaltyRow}
-                onPress={() => {}}
-              >
-                <Text style={styles.rowText}>{`${data.item.username}: ${data.item.penalties}`}</Text>
-              </TouchableOpacity>
-            )
-          }}
-        />
+        {
+          playersWithPenalties.length === 0
+           ? (
+            <View style={styles.emptyListView}>
+              <Text style={[
+                styles.rowText,
+                { color: BEER_YELLOW, marginBottom: '7.5%', marginTop: '5%' }
+              ]}>Ketään ei ole vielä sakotettu!</Text>
+              <Button
+                text='Anna sakko'
+                disabled={false}
+                onPress={() => navigation.navigate('GivePenalty')}
+              />
+            </View>
+           ) : (
+            <FlatList
+              data={playersWithPenalties}
+              keyExtractor={item => `${item.username}-${item.penalties}`}
+              ItemSeparatorComponent={() => {
+                return <View style={{ borderColor: BEER_YELLOW, borderWidth: StyleSheet.hairlineWidth }} />
+              }}
+              renderItem={data => {
+                return (
+                  <TouchableOpacity
+                    style={styles.penaltyRow}
+                    onPress={() => {}}
+                  >
+                    <Text style={styles.rowText}>{`${data.item.username}: ${data.item.penalties}`}</Text>
+                  </TouchableOpacity>
+                )
+              }}
+            />
+           )
+        }
       </View>
     )
   }
@@ -116,7 +137,12 @@ const styles = StyleSheet.create({
     color: WHITE,
     fontFamily: FONT_REGULAR,
     fontSize: 16
+  },
+  emptyListView: {
+    width: '100%',
+    minHeight: 100,
+    alignItems: 'center'
   }
 })
 
-export default TeamPenaltyList
+export default withNavigation(TeamPenaltyList)

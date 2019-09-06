@@ -1,7 +1,8 @@
 
 import React from 'react'
 import { TextInput,
-  StyleSheet } from 'react-native'
+  StyleSheet, 
+  KeyboardType} from 'react-native'
 
 import { FONT_REGULAR } from '../common/fonts'
 import { BLACK } from '../common/colors'
@@ -11,9 +12,10 @@ interface InputFieldProps {
   returnKeyType: string,
   autoFocus: boolean,
   value: string,
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters',
   givenRef?: React.RefObject,
   secureTextEntry?: boolean,
+  keyboardType?: KeyboardType,
   onChange: () => void,
   onSubmitEditing: () => void
 }
@@ -26,6 +28,7 @@ const InputField = ({
   autoCapitalize,
   givenRef,
   secureTextEntry,
+  keyboardType,
   onChangeText,
   onSubmitEditing
 }: InputFieldProps) => {
@@ -40,6 +43,7 @@ const InputField = ({
       autoCorrect={false}
       ref={givenRef}
       secureTextEntry={secureTextEntry}
+      keyboardType={keyboardType}
       onSubmitEditing={onSubmitEditing}
       onChangeText={text => onChangeText(text)}
     />
