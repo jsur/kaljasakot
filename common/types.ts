@@ -3,8 +3,13 @@ export interface Team {
   admins: Array<string>,
   logo_url: string,
   name: string,
-  penalties: {
-    [uid: string]: number
-  },
   players: Array<string>
+}
+
+export interface Player {
+  auth_id: string,
+  team_penalties: {
+    [teamId: string]: number
+  },
+  username: string
 }

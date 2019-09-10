@@ -10,7 +10,7 @@ import ErrorText from './ErrorText'
 
 import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
 import { db, storage } from '../config/firebase'
-import { getPlayer } from '../common/firebase-helpers'
+import { getLoggedInPlayer } from '../common/firebase-helpers'
 import { FONT_REGULAR } from '../common/fonts'
 
 const ERROR_PHOTO = 'Virhe tallennettaessa kuvaa'
@@ -57,7 +57,7 @@ class NewTeam extends React.Component<NavigationInjectedProps, State> {
   createTeam = async (logoUrl: string | undefined) => {
     try {
       const { teamName } = this.state
-      const playerId = await getPlayer()
+      const playerId = await getLoggedInPlayer()
       await db.collection('team').add({
         logo_url: logoUrl || 'https://firebasestorage.googleapis.com/v0/b/kaljasakot.appspot.com/o/questions-circular-button.png?alt=media&token=0fcb0852-cc21-4e82-bc0c-af6969e3f5df',
         name: teamName,

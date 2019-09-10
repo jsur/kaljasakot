@@ -4,17 +4,9 @@ import { withNavigation, NavigationInjectedProps } from 'react-navigation'
 
 import Button from './Button'
 
-import firebase from '../config/firebase'
 import { WHITE, BEER_YELLOW } from '../common/colors'
 import { FONT_REGULAR } from '../common/fonts'
-
-interface Player {
-  auth_id: string,
-  team_penalties: {
-    [teamId: string]: number
-  },
-  username: string
-}
+import { getPlayerById } from '../common/firebase-helpers'
 
 interface Props {
   players: Array<string>,
@@ -25,24 +17,27 @@ interface State {
   playersWithPenalties: Array<{
     username: string,
     penalties: number
-  }>
+  }>,
+  loading: boolean
 }
 
 class TeamPenaltyList extends React.Component<NavigationInjectedProps & Props, State> {
   state = {
-    playersWithPenalties: []
+    playersWithPenalties: [],
+    loading: false
   }
   
   componentDidMount() {
     if (this.props.players.length > 0) {
-      // this.populateState()
+      this.populateState()
     }
   }
 
   populateState = async () => {
     const { players, teamId } = this.props
     try {
-      const promises = players.map(id => this.getPenaltiesForPlayer(id))
+      this.setState({ loading: true })
+      const promises = players.map(id => getPlayerById(id))
       const resolved = await Promise.all(promises)
       const teamPlayers = resolved.filter(item => typeof item.team_penalties[teamId] === 'number')
       this.setState({
@@ -51,41 +46,29 @@ class TeamPenaltyList extends React.Component<NavigationInjectedProps & Props, S
             username: item.username,
             penalties: item.team_penalties[teamId]
           }
-        }).sort((a, b) => b.penalties - a.penalties)
+        }).sort((a, b) => b.penalties - a.penalties),
+        loading: false
       })
     } catch (error) {
       console.log(error)
+      this.setState({ loading: false })
     }
   }
 
-  getPenaltiesForPlayer = async (playerDocId: string): Player => {
-    const snapshot = await firebase.firestore()
-      .collection('player')
-      .doc(playerDocId)
-      .get()
-
-    return snapshot.data()
-  }
-
   render() {
-    const { playersWithPenalties } = this.state
+    const { playersWithPenalties, loading } = this.state
     const { navigation } = this.props
     return (
       <View style={styles.main}>
         <Text style={styles.header}>Jaetut sakot:</Text>
         {
-          playersWithPenalties.length === 0
+          !loading && playersWithPenalties.length === 0
            ? (
             <View style={styles.emptyListView}>
               <Text style={[
                 styles.rowText,
                 { color: BEER_YELLOW, marginBottom: '7.5%', marginTop: '5%' }
-              ]}>Ketään ei ole vielä sakotettu!</Text>
-              <Button
-                text='Anna sakko'
-                disabled={false}
-                onPress={() => navigation.navigate('GivePenalty')}
-              />
+              ]}>Ei sakkoja</Text>
             </View>
            ) : (
             <FlatList
@@ -107,6 +90,7 @@ class TeamPenaltyList extends React.Component<NavigationInjectedProps & Props, S
             />
            )
         }
+        <Button text='Uusi sakko' disabled={false} onPress={() => navigation.navigate('GivePenalty')} />
       </View>
     )
   }

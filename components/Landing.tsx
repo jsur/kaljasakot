@@ -20,7 +20,7 @@ import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
 import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts'
 
 import { db, auth } from '../config/firebase'
-import { getPlayer, getOwnTeam } from '../common/firebase-helpers'
+import { getLoggedInPlayer, getOwnTeam } from '../common/firebase-helpers'
 import { withAppState, AppStateType } from '../AppState'
 import { Team } from '../common/types'
 
@@ -88,7 +88,7 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
 
   onTeamPress = async (team: Team) => {
     try {
-      const playerId = await getPlayer()
+      const playerId = await getLoggedInPlayer()
       const newPlayers = [...team.players, playerId]
       await db.collection('team').doc(team.id).update({ players: newPlayers })
       await this.refreshOwnTeam()
@@ -101,7 +101,6 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
   render() {
     const { allTeams, loading } = this.state
     const { currentTeam } = this.props.appState
-    console.log('rendered!!!')
     return (
       <PageContainer>
         <View style={styles.main}>

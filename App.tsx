@@ -24,7 +24,12 @@ console.disableYellowBox = true
 const firstTabButtonNavigator = createStackNavigator({
   Landing,
   NewTeam,
-  GivePenalty
+  GivePenalty: {
+    screen: GivePenalty,
+    navigationOptions: {
+      title: 'Valitse sakon saaja'
+    }
+  }
 })
 
 const LoggedInNavigator = createBottomTabNavigator({
