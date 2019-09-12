@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 
@@ -24,7 +24,7 @@ const NewUser = (props: NavigationInjectedProps) => {
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const createUser = useCallback(async (username: string, email: string, password: string, passwordAgain: string) => {
+  const createUser = async () => {
     if (loading) return
     if (password !== passwordAgain) {
       return setErrorMsg('Salasanat eivät täsmää')
@@ -49,7 +49,7 @@ const NewUser = (props: NavigationInjectedProps) => {
       setErrorMsg(getAuthErrorString(error.code))
       setLoading(false)
     }
-  }, loading)
+  }
 
   return (
     <PageContainer backgroundColor={BEER_YELLOW}>
@@ -107,14 +107,15 @@ const NewUser = (props: NavigationInjectedProps) => {
             setErrorMsg('')
             setPasswordAgain(text)
           }}
-          onSubmitEditing={() => createUser(username, email, password, passwordAgain)}
+          onSubmitEditing={createUser}
         />
         <View style={{ marginTop: '5%' }}>
           <Button
             text='Luo käyttäjä'
             loading={loading}
             disabled={loading || !username || !email || !password || !passwordAgain}
-            onPress={() => createUser(username, email, password, passwordAgain)} />
+            onPress={createUser}
+          />
         </View>
       </View>
     </PageContainer>
@@ -134,11 +135,3 @@ const styles = StyleSheet.create({
 })
 
 export default NewUser
-
-
-  /*
-  createUser = () => {
-    
-    .then(success => this.goToApp())
-    .catch(error => this.setState({ errorMsg: error.message }))
-  } */

@@ -10,9 +10,16 @@ import SvgBubble from './SvgBubble'
 import { BEER_YELLOW, WHITE } from '../common/colors'
 import { FONT_MEDIUM } from '../common/fonts'
 
+import { withAppState, AppStateType } from '../AppState'
+import { getLoggedInPlayer } from '../common/firebase-helpers'
+
 const { width, height } = Dimensions.get('window')
 
-class Login extends React.Component<NavigationInjectedProps> {
+interface Props {
+  appState: AppStateType
+}
+
+class Login extends React.Component<NavigationInjectedProps & Props> {
   willFocusListener = null
   willBlurListener = null
   bubbles = null
@@ -63,7 +70,12 @@ class Login extends React.Component<NavigationInjectedProps> {
       }).start()
   }
 
-  goTo = (to: string) => this.props.navigation.navigate(to)
+  goTo = async (to: string) => {
+    const player = await getLoggedInPlayer()
+    this.props.appState.updateAppState({
+      currentPlayer: player
+    }, () => this.props.navigation.navigate(to))
+  }
 
   render() {
     const { errorMsg } = this.state
@@ -135,4 +147,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Login
+export default withAppState(Login)

@@ -1,18 +1,18 @@
 import { db, auth } from '../config/firebase'
 import { Team, Player } from './types'
 
-export const getLoggedInPlayer = async (): string | undefined => {
+export const getLoggedInPlayer = async (): Player | undefined => {
   try {
     const snapshot = await db.collection('player').where('auth_id', '==', auth.currentUser.uid).get()
-    return snapshot.docs.length > 0 && snapshot.docs[0].id
+    return snapshot.docs.length > 0 && { ...snapshot.docs[0].data(), id: snapshot.docs[0].id }
   } catch (error) {
     console.log(error)
   }
 }
 
 export const getOwnTeam = async (): Team => {
-  const playerId = await getLoggedInPlayer()
-  const snapshot = await db.collection('team').where('players', 'array-contains', playerId).get()
+  const player = await getLoggedInPlayer()
+  const snapshot = await db.collection('team').where('players', 'array-contains', player.id).get()
   // multiple teams later?
   const teams = []
   snapshot.forEach(doc => teams.push({ ...doc.data(), id: doc.id }))

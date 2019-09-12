@@ -72,7 +72,12 @@ const LoggedInNavigator = createBottomTabNavigator({
 
 const LoginNavigator = createStackNavigator({
   Login: Login,
-  NewUser: NewUser,
+  NewUser: {
+    screen: NewUser,
+    navigationOptions: {
+      title: 'Uusi käyttäjä'
+    }
+  },
   LoggedIn: LoggedInNavigator
 }, {
   initialRouteName: 'Login',

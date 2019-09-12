@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   ActivityIndicator,
+  Alert,
   Image,
   StyleSheet,
   View,
@@ -86,12 +87,25 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
     }
   }
 
-  onTeamPress = async (team: Team) => {
+  showAlert = (team: Team) => {
+    Alert.alert(
+      `Liityt joukkueeseen ${team.name}.`,
+      'Oletko varma?',
+      [
+        { text: 'En', onPress: () => null, style: 'cancel' },
+        { text: 'Kyllä', onPress: () => this.addPlayerToTeam(team), style: 'default' }
+      ]
+    )
+  }
+
+  addPlayerToTeam = async (team: Team) => {
     try {
-      const playerId = await getLoggedInPlayer()
-      const newPlayers = [...team.players, playerId]
+      this.setState({ loading: true })
+      const player = await getLoggedInPlayer()
+      const newPlayers = [...team.players, player.id]
       await db.collection('team').doc(team.id).update({ players: newPlayers })
       await this.refreshOwnTeam()
+      this.setState({ loading: false })
     } catch (error) {
       console.log(error)
       this.setState({ loading: false })
@@ -130,7 +144,7 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
                           <TouchableOpacity
                             disabled={loading}
                             style={styles.teamRow}
-                            onPress={() => this.onTeamPress(data.item)}
+                            onPress={() => this.showAlert(data.item)}
                           >
                             <Image source={{ uri: data.item.logo_url }} style={styles.teamRowLogo} resizeMode='contain' />
                             <Text style={styles.teamRowText}>{data.item.name}</Text>

@@ -57,12 +57,12 @@ class NewTeam extends React.Component<NavigationInjectedProps, State> {
   createTeam = async (logoUrl: string | undefined) => {
     try {
       const { teamName } = this.state
-      const playerId = await getLoggedInPlayer()
+      const player = await getLoggedInPlayer()
       await db.collection('team').add({
         logo_url: logoUrl || 'https://firebasestorage.googleapis.com/v0/b/kaljasakot.appspot.com/o/questions-circular-button.png?alt=media&token=0fcb0852-cc21-4e82-bc0c-af6969e3f5df',
         name: teamName,
-        admins: [ playerId ],
-        players: [ playerId ]
+        admins: [ player.id ],
+        players: [ player.id ]
       })
     } catch (error) {
       console.log(error)

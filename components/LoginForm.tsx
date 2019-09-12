@@ -36,8 +36,8 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
     try {
       await firebase.auth().signInWithEmailAndPassword(email, password)
       await storeData('email', email)
+      await onSuccess()
       setLoading(false)
-      onSuccess()
     } catch (error) {
       console.log(error)
       console.log(error.code)

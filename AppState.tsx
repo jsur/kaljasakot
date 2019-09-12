@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Team } from './common/types'
+import { Team, Player } from './common/types'
 
 export const AppContext = React.createContext({})
 
@@ -10,16 +10,18 @@ interface AppStateActions {
 
 interface AppStateKeys {
   currentTeam: Team,
-  currentPlayerId: string,
+  currentPlayer: Player
+}
+
+export const emptyAppState = {
+  currentTeam: undefined,
+  currentPlayer: undefined
 }
 
 export type AppStateType = AppStateActions & AppStateKeys
 
 class AppState extends React.Component {
-  state = {
-    currentTeam: undefined,
-    currentPlayerId: ''
-  }
+  state = emptyAppState
 
 
   updateAppState = (stateObj: Appst, cb?: () => any) => {
