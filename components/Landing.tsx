@@ -36,7 +36,7 @@ interface State {
 class Landing extends React.Component<NavigationInjectedProps & Props, State> {
   willFocusListener: NavigationEventSubscription = null
   static navigationOptions = {
-    title: 'Sakot',
+    headerLayoutPreset: 'center',
     tabBarIcon: ({ focused }) => {
       return <TabBarIcon imgSrc={focused
         ? require('../assets/images/jar-of-beer-white.png')
@@ -109,9 +109,16 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
               ? <ActivityIndicator size='large' color={BEER_YELLOW} />
               : !currentTeam ? (
                 <View style={styles.noTeamWrapper}>
-                  <Text style={styles.noTeamText}>Et ole vielä liittynyt</Text>
-                  <Text style={styles.noTeamText}>mihinkään joukkueeseen.</Text>
-                  <Text style={[styles.noTeamText, { marginTop: '2%' }]}>Valitse joku alla olevista tai luo uusi!</Text>
+                  { (allTeams && allTeams.length > 0) ? (
+                    <>
+                      <Text style={styles.noTeamText}>Et ole vielä liittynyt</Text>
+                      <Text style={styles.noTeamText}>mihinkään joukkueeseen.</Text>
+                      <Text style={[styles.noTeamText, { marginTop: '2%' }]}>Valitse joku alla olevista tai luo uusi!</Text>
+                    </>
+                  ) : (
+                    <Text style={styles.noTeamText}>Kukaan ei ole vielä luonut joukkuetta.</Text>
+                  )
+                }
                   <View style={styles.listWrapper}>
                     <FlatList
                       style={{ width: '100%', height: '80%' }}

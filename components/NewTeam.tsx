@@ -157,7 +157,8 @@ const styles = StyleSheet.create({
     marginTop: '5%',
     fontFamily: FONT_REGULAR,
     fontSize: 16,
-    color: BEER_YELLOW
+    color: BEER_YELLOW,
+    textAlign: 'center'
   },
   buttonWrapper: {
     width: '100%',

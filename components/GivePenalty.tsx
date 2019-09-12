@@ -1,7 +1,6 @@
-import React, { useState, useContext, useCallback, useEffect } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Animated } from 'react-native'
 import { AppContext } from '../AppState'
-// import { withNavigation, NavigationInjectedProps } from 'react-navigation'
 
 import PageContainer from './PageContainer'
 import Button from './Button'
@@ -9,7 +8,7 @@ import ErrorText from './ErrorText'
 
 import { LOGGEDIN_BACKGROUND, WHITE } from '../common/colors'
 import { AppStateType } from '../AppState'
-import { getPlayers } from '../common/firebase-helpers'
+import { getPlayers, savePenalty } from '../common/firebase-helpers'
 import { Player } from '../common/types'
 import { BEER_YELLOW } from '../common/colors'
 import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts'
@@ -21,9 +20,11 @@ const GivePenalty = () => {
   const [teamPlayers, setTeamPlayers] = useState<Player[]>([])
   const [selectedPlayer, setSelectedPlayer] = useState<Player>(null)
   const [errorMsg, setErrorMsg] = useState<string>('')
-  const [givenPenaltyAmount, setGivenPenaltyAmount] = useState<number>(0)
+  const [penaltyAmount, setPenaltyAmount] = useState<number>(0)
+  const [successMsg, setSuccessMsg] = useState<string>('')
 
   const animateHeight = () => {
+    setSuccessMsg('')
     penaltyViewAnimation.setValue(0)
     Animated.spring(penaltyViewAnimation, { toValue: 1 }).start()
   }
@@ -48,18 +49,32 @@ const GivePenalty = () => {
     fetchTeamPlayers()
   }, [])
 
-  const updatePenalty = useCallback(async (increment: 'more' | 'less', selectedPlayer: Player) => {
-    console.log('selectedPlayer.team_penalties:', selectedPlayer)
-    const currentPenalties = selectedPlayer.team_penalties[appState.currentTeam.id] || 0
-    if (increment === 'more') {
-      setGivenPenaltyAmount(prevState => prevState + 1)
-    }
-    if (increment === 'less' && currentPenalties > 0) {
-      setGivenPenaltyAmount(prevState => prevState - 1)
-    }
-  }, givenPenaltyAmount)
+  const updatePenalty = (increment: 'more' | 'less', selectedPlayer: Player) => {
+    setSuccessMsg('')
+    if (increment === 'more') return setPenaltyAmount(prevState => prevState + 1)
+    if (increment === 'less' && penaltyAmount > 0) return setPenaltyAmount(prevState => prevState - 1)
+  }
 
-  console.log('selectedPlayer:', selectedPlayer)
+  const getCurrentPenaltyAmount = (selectedPlayer: Player) => {
+    return selectedPlayer && selectedPlayer.team_penalties[appState.currentTeam.id]
+      ? selectedPlayer.team_penalties[appState.currentTeam.id]
+      : 0
+  }
+
+  const savePenaltyToDB = async () => {
+    try {
+      setLoading(true)
+      if (selectedPlayer && appState.currentTeam.id) {
+        await savePenalty(penaltyAmount, appState.currentTeam.id, selectedPlayer)
+        setSuccessMsg('Sakko päivitetty!')
+      }
+    } catch (error) {
+      setErrorMsg(error.message)
+      setLoading(false)
+    }
+    setLoading(false)
+  }
+
   return (
     <PageContainer>
       <View style={styles.main}>
@@ -77,6 +92,7 @@ const GivePenalty = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedPlayer(isSelectedPlayer ? null : data.item)
+                    setPenaltyAmount(getCurrentPenaltyAmount(data.item))
                     !selectedPlayer ? animateHeight() : null
                   }}
                   style={styles.playerRow}
@@ -101,19 +117,30 @@ const GivePenalty = () => {
         {
           selectedPlayer && (
             <Animated.View style={[styles.penaltyAmountWrapper, { height: interpolatedHeight }]}>
-              <Text style={styles.penaltyAmountHeader}>Sakon määrä</Text>
+              <Text style={styles.penaltyAmountHeader}>Sakot nyt:</Text>
               <View style={styles.penaltyAmountCounter}>
-                <Text style={styles.givenPenaltyAmount}>{givenPenaltyAmount}</Text>
-                <TouchableOpacity onPress={() => updatePenalty('more', selectedPlayer)}>
+              <TouchableOpacity style={styles.penaltyTouchable} onPress={() => updatePenalty('less', selectedPlayer)}>
                   <Image
-                    source={require('../assets/images/jar-of-beer-white.png')}
-                    style={{ width: 40, height: 40 }}
+                    source={require('../assets/images/minus-button-circle-white.png')}
+                    style={[styles.penaltyImg, { opacity: penaltyAmount <= 0 ? 0.2 : 1 }]}
+                    resizeMode='contain'
+                    />
+                </TouchableOpacity>
+                <Text style={styles.penaltyAmountText}>{penaltyAmount}</Text>
+                <TouchableOpacity style={styles.penaltyTouchable} onPress={() => updatePenalty('more', selectedPlayer)}>
+                  <Image
+                    source={require('../assets/images/plus-button-circle-white.png')}
+                    style={styles.penaltyImg}
                     resizeMode='contain'
                     />
                 </TouchableOpacity>
               </View>
-              <View>
-                <Text>tähän tallennus</Text>
+              <View style={styles.buttonWrapper}>
+                <Button
+                  text={successMsg !== '' ? successMsg : 'Tallenna'}
+                  disabled={successMsg !== '' || loading}
+                  onPress={savePenaltyToDB}
+                />
               </View>
             </Animated.View>
           )
@@ -162,13 +189,22 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingLeft: '12.5%',
+    paddingRight: '12.5%'
   },
-  givenPenaltyAmount: {
+  penaltyAmountText: {
     fontFamily: FONT_MEDIUM,
     fontSize: 80,
     color: WHITE
+  },
+  penaltyImg: {
+    width: 50,
+    height: 50
+  },
+  buttonWrapper: {
+    marginBottom: '5%'
   }
 })
 

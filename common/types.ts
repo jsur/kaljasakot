@@ -7,6 +7,7 @@ export interface Team {
 }
 
 export interface Player {
+  id: string,
   auth_id: string,
   team_penalties: {
     [teamId: string]: number

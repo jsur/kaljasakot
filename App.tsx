@@ -22,7 +22,12 @@ import AppState from './AppState'
 console.disableYellowBox = true
 
 const firstTabButtonNavigator = createStackNavigator({
-  Landing,
+  Landing: {
+    screen: Landing,
+    navigationOptions: {
+      title: 'Sakot'
+    }
+  },
   NewTeam,
   GivePenalty: {
     screen: GivePenalty,
@@ -30,6 +35,8 @@ const firstTabButtonNavigator = createStackNavigator({
       title: 'Valitse sakon saaja'
     }
   }
+}, {
+  headerLayoutPreset: 'center'
 })
 
 const LoggedInNavigator = createBottomTabNavigator({
@@ -52,6 +59,7 @@ const LoggedInNavigator = createBottomTabNavigator({
     headerLeft: null
   },
   initialRouteName: 'firstTab',
+  headerLayoutPreset: 'center',
   tabBarOptions: {
     activeTintColor: WHITE,
     inactiveTintColor: BLACK,

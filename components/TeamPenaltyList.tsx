@@ -79,18 +79,15 @@ class TeamPenaltyList extends React.Component<NavigationInjectedProps & Props, S
               }}
               renderItem={data => {
                 return (
-                  <TouchableOpacity
-                    style={styles.penaltyRow}
-                    onPress={() => {}}
-                  >
+                  <View style={styles.penaltyRow}>
                     <Text style={styles.rowText}>{`${data.item.username}: ${data.item.penalties}`}</Text>
-                  </TouchableOpacity>
+                  </View>
                 )
               }}
             />
            )
         }
-        <Button text='Uusi sakko' disabled={false} onPress={() => navigation.navigate('GivePenalty')} />
+        <Button text='Anna sakko' disabled={false} onPress={() => navigation.navigate('GivePenalty')} />
       </View>
     )
   }

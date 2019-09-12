@@ -21,11 +21,23 @@ export const getOwnTeam = async (): Team => {
 
 export const getPlayerById = async (playerId: string): Player => {
   const snapshot = await db.collection('player').doc(playerId).get()
-  return snapshot.data()
+
+  return { ...snapshot.data(), id: snapshot.id }
 }
 
 export const getPlayers = async (playerIds: Array<string>): Array<Player> => {
   const promises = playerIds.map(id => getPlayerById(id))
   const players = await Promise.all(promises)
   return players
+}
+
+export const savePenalty = (penaltyAmount: number, teamId: string, player: Player) => {
+  const newPlayer = {
+    ...player,
+    team_penalties: {
+      ...player.team_penalties,
+      [teamId]: penaltyAmount
+    }
+  }
+  return db.collection('player').doc(player.id).set(newPlayer)
 }
