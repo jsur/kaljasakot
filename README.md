@@ -5,4 +5,4 @@
 
 Jar of beer: https://www.flaticon.com/authors/freepik  
 Settings: https://www.flaticon.com/authors/gregor-cresnar  
-Plus / Minus button: <"https://www.flaticon.com/authors/minh-hoang"  
+Plus / Minus button: https://www.flaticon.com/authors/minh-hoang  
