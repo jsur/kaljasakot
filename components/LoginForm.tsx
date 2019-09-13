@@ -30,7 +30,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
     retrieveData('email').then(previousEmail => setEmail(previousEmail || ''))
   }, [])
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = async (email: string, password: string) => {
     if (loading) return
     setLoading(true)
     try {
@@ -44,7 +44,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
       setErrorMsg(getAuthErrorString(error.code))
       setLoading(false)
     }
-  }, loading)
+  }
 
   return (
     <View style={styles.form}>

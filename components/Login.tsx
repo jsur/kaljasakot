@@ -113,7 +113,7 @@ class Login extends React.Component<NavigationInjectedProps & Props> {
           </View>
           <TouchableOpacity
             style={{ padding: 10 }}
-            onPress={() => this.goTo('NewUser')}
+            onPress={() => this.props.navigation.navigate('NewUser')}
           >
               <Text style={styles.newUserText}>Luo uusi käyttäjä</Text>
             </TouchableOpacity>

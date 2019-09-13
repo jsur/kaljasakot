@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 
@@ -6,6 +6,8 @@ import PageContainer from './PageContainer'
 import ErrorText from './ErrorText'
 import InputField from './InputField'
 import Button from './Button'
+
+import { AppContext, AppStateType } from '../AppState'
 
 import { getAuthErrorString } from '../common/auth-helpers'
 
@@ -24,6 +26,8 @@ const NewUser = (props: NavigationInjectedProps) => {
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const appState: AppStateType = useContext(AppContext)
+
   const createUser = async () => {
     if (loading) return
     if (password !== passwordAgain) {
@@ -35,11 +39,13 @@ const NewUser = (props: NavigationInjectedProps) => {
     setLoading(true)
     try {
       const newUser = await auth.createUserWithEmailAndPassword(email, password)
-      await db.collection('player').add({
+      const newPlayer = {
         username,
         auth_id: newUser.user.uid,
         team_penalties: {}
-      })
+      }
+      await db.collection('player').add(newPlayer)
+      appState.updateAppState({ currentPlayer: newPlayer })
       setLoading(false)
       props.navigation.navigate('Landing')
       
@@ -74,6 +80,7 @@ const NewUser = (props: NavigationInjectedProps) => {
           value={email}
           autoCapitalize='none'
           givenRef={emailRef}
+          keyboardType='email-address'
           onSubmitEditing={() => passwordRef.current.focus()}
           onChangeText={text => {
             setErrorMsg('')
@@ -113,7 +120,7 @@ const NewUser = (props: NavigationInjectedProps) => {
           <Button
             text='Luo käyttäjä'
             loading={loading}
-            disabled={loading || !username || username.length < 3 || username.length < 15 || !email || !password || !passwordAgain}
+            disabled={loading || !username || username.length < 3 || username.length > 15 || !email || !password || !passwordAgain}
             onPress={createUser}
           />
         </View>
