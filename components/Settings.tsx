@@ -1,6 +1,7 @@
 import React from 'react'
-import { StyleSheet, View, Text, AppState } from 'react-native'
+import { StyleSheet, View, Text, Image } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
+import * as DocumentPicker from 'expo-document-picker'
 
 import PageContainer from './PageContainer'
 import TabBarIcon from './TabBarIcon'
@@ -10,6 +11,7 @@ import InputField from './InputField'
 import { withAppState, AppStateType, emptyAppState } from '../AppState'
 
 import { clearNavigationStack } from '../common/auth-helpers'
+import { uploadPhoto } from '../common/file-upload-helpers'
 import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
 import { FONT_REGULAR } from '../common/fonts'
 import { auth, db } from '../config/firebase'
@@ -23,6 +25,7 @@ interface State {
   usernameInputVisible: boolean,
   newUsername: string,
   loading: boolean,
+  uploadLoading: boolean,
   errorMsg: string
 }
 
@@ -42,6 +45,7 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
     usernameInputVisible: false,
     newUsername: '',
     loading: false,
+    uploadLoading: false,
     errorMsg: ''
   }
 
@@ -96,8 +100,30 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
     return ''
   }
 
+  chooseLogo = async () => {
+    try {
+      const { currentTeam } = this.props.appState
+      const result = await DocumentPicker.getDocumentAsync({ type: 'image/*' })
+      if (result.type === 'success') {
+        this.setState({ errorMsg: '', uploadLoading: true })
+        const imageUrl = await uploadPhoto({ logoUri: result.uri, logoName: result.name })
+        const newCurrentTeam = {
+          ...currentTeam,
+          logo_url: imageUrl
+        }
+        await db.collection('team').doc(currentTeam.id).set(newCurrentTeam)
+        this.props.appState.updateAppState({ currentTeam: newCurrentTeam }, () => {
+          this.setState({ uploadLoading: false })
+        })
+      }
+    } catch (error) {
+      this.setState({ errorMsg: error.message, uploadLoading: false })
+    }
+  }
+
   render() {
-    const { isLoggingOut, usernameInputVisible, newUsername, loading } = this.state
+    const { currentTeam } = this.props.appState
+    const { isLoggingOut, usernameInputVisible, newUsername, loading, uploadLoading } = this.state
     return (
       <PageContainer>
         <View style={styles.main}>
@@ -123,12 +149,28 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
                   onSubmitEditing={this.updateUsername}
                   onChangeText={text => this.setState({ newUsername: text })}
                 />
+                <View style={{ height: '2%' }} />
                 <Button
                   text='Tallenna'
                   onPress={this.updateUsername}
                   disabled={loading || !this.newUsernameIsValid()}
                   loading={loading}
                   extraStyles={{ width: '50%' }}
+                />
+              </View>
+            )
+          }
+          {
+            currentTeam && (
+              <View style={styles.settingsRow}>
+                <Text style={styles.settingsText}>Logo:</Text>
+                <Image source={{ uri: currentTeam.logo_url }} style={styles.settingsLogo} resizeMode='contain' />
+                <Button
+                  text='Muuta'
+                  onPress={this.chooseLogo}
+                  disabled={uploadLoading}
+                  loading={uploadLoading}
+                  extraStyles={styles.settingsButton}
                 />
               </View>
             )
@@ -179,10 +221,14 @@ const styles = StyleSheet.create({
   },
   settingEditRow: {
     width: '90%',
-    height: '28.5%',
     padding: '2.5%',
     alignItems: 'center',
     justifyContent: 'space-between'
+  },
+  settingsLogo: {
+    width: 50,
+    height: 50,
+    marginLeft: '5%'
   }
 })
 

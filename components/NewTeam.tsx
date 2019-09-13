@@ -9,11 +9,10 @@ import InputField from './InputField'
 import ErrorText from './ErrorText'
 
 import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
-import { db, storage } from '../config/firebase'
+import { db } from '../config/firebase'
 import { getLoggedInPlayer } from '../common/firebase-helpers'
+import { uploadPhoto } from '../common/file-upload-helpers'
 import { FONT_REGULAR } from '../common/fonts'
-
-const ERROR_PHOTO = 'Virhe tallennettaessa kuvaa'
 
 interface State {
   loading: boolean,
@@ -38,22 +37,6 @@ class NewTeam extends React.Component<NavigationInjectedProps, State> {
 
   showError = (errorMsg: string) => this.setState({ errorMsg, loading: false })
 
-  uploadPhoto = async () => {
-    try {
-      const { logoUri, logoName } = this.state
-      if (!logoUri) return
-      const contentType = `image/${logoUri.slice(logoUri.lastIndexOf('.') + 1)}`
-      const res = await fetch(logoUri)
-      const blob = await res.blob()
-      const snapshot = await storage.ref().child(logoName).put(blob, { contentType })
-      const url: string = await snapshot.ref.getDownloadURL()
-      return url
-    } catch (error) {
-      console.log(error)
-      throw new Error(ERROR_PHOTO)
-    }
-  }
-
   createTeam = async (logoUrl: string | undefined) => {
     try {
       const { teamName } = this.state
@@ -72,8 +55,9 @@ class NewTeam extends React.Component<NavigationInjectedProps, State> {
 
   onSubmit = async () => {
     try {
+      const { logoUri, logoName } = this.state
       this.setState({ loading: true })
-      const url = await this.uploadPhoto()
+      const url = await uploadPhoto({ logoUri, logoName })
       await this.createTeam(url)
       this.setState({ loading: false }, () => {
         this.props.navigation.navigate('Landing')
