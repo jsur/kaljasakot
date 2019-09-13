@@ -56,7 +56,7 @@ const NewUser = (props: NavigationInjectedProps) => {
       <View style={styles.form}>
         <ErrorText text={errorMsg} />
         <InputField
-          placeholder='Nimimerkki'
+          placeholder='Käyttäjänimi'
           returnKeyType='next'
           autoFocus
           value={username}
@@ -113,7 +113,7 @@ const NewUser = (props: NavigationInjectedProps) => {
           <Button
             text='Luo käyttäjä'
             loading={loading}
-            disabled={loading || !username || !email || !password || !passwordAgain}
+            disabled={loading || !username || username.length < 3 || username.length < 15 || !email || !password || !passwordAgain}
             onPress={createUser}
           />
         </View>

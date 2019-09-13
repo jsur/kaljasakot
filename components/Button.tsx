@@ -8,14 +8,18 @@ interface ButtonProps {
   text: string,
   loading: boolean,
   disabled: boolean,
+  extraStyles?: {
+    [key]: string | number
+  },
   onPress: () => any
 }
 
-const Button = ({ text, loading, disabled, onPress }: ButtonProps) => {
+const Button = ({ text, loading, disabled, extraStyles = {}, onPress }: ButtonProps) => {
   return (
     <TouchableOpacity
       style={[
         styles.touchable,
+        extraStyles,
         {
           backgroundColor: disabled ? DISABLED_GRAY : 'transparent'
         }

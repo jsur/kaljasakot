@@ -1,15 +1,13 @@
 
 import React from 'react'
-import { TextInput,
-  StyleSheet, 
-  KeyboardType} from 'react-native'
+import { TextInput, StyleSheet, KeyboardType, ReturnKeyType } from 'react-native'
 
 import { FONT_REGULAR } from '../common/fonts'
 import { BLACK } from '../common/colors'
 
 interface InputFieldProps {
   placeholder: string,
-  returnKeyType: string,
+  returnKeyType: ReturnKeyType,
   autoFocus: boolean,
   value: string,
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters',
