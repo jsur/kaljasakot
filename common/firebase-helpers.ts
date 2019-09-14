@@ -1,5 +1,5 @@
 import { db, auth } from '../config/firebase'
-import { Team, Player } from './types'
+import { Team, Player, TeamApplicant } from './types'
 
 export const getLoggedInPlayer = async (): Player | undefined => {
   try {
@@ -48,4 +48,18 @@ export const savePenalty = (penaltyAmount: number, teamId: string, player: Playe
     }
   }
   return db.collection('player').doc(player.id).set(newPlayer)
+}
+
+export const getTeamApplicants = async (teamId: string): Array<TeamApplicant> => {
+  const snapshot = await db.collection('applicant').where('teamId', '==', teamId).get()
+  return snapshot.docs.map(doc => {
+    return {
+      ...doc.data(),
+      docId: doc.id
+    }
+  })
+}
+
+export const removeApplicant = async (docId: string) => {
+  await db.collection('applicant').doc(docId).delete()
 }

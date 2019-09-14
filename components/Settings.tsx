@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Text, Image } from 'react-native'
+import { StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import * as DocumentPicker from 'expo-document-picker'
 
@@ -12,10 +12,12 @@ import { withAppState, AppStateType, emptyAppState } from '../AppState'
 
 import { clearNavigationStack } from '../common/auth-helpers'
 import { uploadPhoto } from '../common/file-upload-helpers'
+import { getTeamApplicants, removeApplicant } from '../common/firebase-helpers'
 import { playerIsAdmin, usernameIsValid } from '../common/common-helpers'
 
 import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
 import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts'
+import { TeamApplicant } from '../common/types'
 import { auth, db } from '../config/firebase'
 
 interface Props {
@@ -28,7 +30,9 @@ interface State {
   newUsername: string,
   loading: boolean,
   uploadLoading: boolean,
-  errorMsg: string
+  applicantsLoading: boolean,
+  errorMsg: string,
+  applicants: Array<TeamApplicant>
 }
 
 class Settings extends React.Component<NavigationInjectedProps & Props, State> {
@@ -48,7 +52,26 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
     newUsername: '',
     loading: false,
     uploadLoading: false,
-    errorMsg: ''
+    applicantsLoading: false,
+    errorMsg: '',
+    applicants: []
+  }
+
+  componentDidMount() {
+    this.getApplicants()
+  }
+
+  getApplicants = async () => {
+    const { appState } = this.props
+    if (playerIsAdmin(appState)) {
+      try {
+        this.setState({ applicantsLoading: true })
+        const applicants = await getTeamApplicants(appState.currentTeam.id)
+        this.setState({ applicants, applicantsLoading: false })
+      } catch (error) {
+        this.setState({ errorMsg: error.message, applicantsLoading: false })
+      }
+    }
   }
 
   logout = async () => {
@@ -58,7 +81,7 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
       await auth.signOut()
       this.setState({ isLoggingOut: false }, () => clearNavigationStack(this.props.navigation))
     } catch (error) {
-
+      this.setState({ errorMsg: error.message })
     }
   }
 
@@ -118,9 +141,25 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
     }
   }
 
+  onApplicantPress = async (choice: 'deny' | 'accept', item: TeamApplicant) => {
+    try {
+      this.setState({ applicantsLoading: true })
+      await removeApplicant(item.docId)
+      if (choice === 'accept') {
+        const { currentTeam } = this.props.appState
+        await db.collection('team').doc(currentTeam.id).update({
+          players: [ ...currentTeam.players, item.playerId ]
+        })
+      }
+      await this.getApplicants()
+    } catch (error) {
+      this.setState({ errorMsg: error.message })
+    }
+  }
+
   render() {
     const { currentTeam } = this.props.appState
-    const { isLoggingOut, usernameInputVisible, newUsername, loading, uploadLoading } = this.state
+    const { isLoggingOut, usernameInputVisible, newUsername, loading, uploadLoading, applicants, applicantsLoading } = this.state
     const isAdmin = playerIsAdmin(this.props.appState)
     return (
       <PageContainer>
@@ -178,13 +217,47 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
               <View style={styles.adminSettings}>
                 <Text style={styles.settingsHeader}>Ylläpito</Text>
                 <View style={styles.teamApplicantWrapper}>
-                  <Text style={styles.settingsText}>Hyväksy / hylkää pelaaja</Text>
+                  <Text style={[styles.settingsText, { marginBottom: '2.5%' }]}>Hyväksy / hylkää pelaaja</Text>
+                  <ScrollView>
+                    {
+                      applicantsLoading
+                        ? <ActivityIndicator size='small' color={BEER_YELLOW} />
+                        :  applicants.map(item => {
+                            return (
+                              <View key={item.playerId} style={styles.applicantRow}>
+                                <Text style={[styles.settingsText, { color: BEER_YELLOW, flex: 1 }]}>{item.playerName}</Text>
+                                <View style={styles.applicantButtons}>
+                                  <TouchableOpacity onPress={() => this.onApplicantPress('deny', item)}>
+                                    <Image
+                                      source={require('../assets/images/cancel-red.png')}
+                                      style={styles.applicantImage}
+                                      resizeMode='contain'
+                                    />
+                                  </TouchableOpacity>
+                                  <TouchableOpacity onPress={() => this.onApplicantPress('accept', item)}>
+                                    <Image
+                                      source={require('../assets/images/checked-green.png')}
+                                      style={styles.applicantImage}
+                                      resizeMode='contain'
+                                    />
+                                  </TouchableOpacity>
+                                </View>
+                              </View>
+                            )
+                          })
+                      }
+                  </ScrollView>
                 </View>
               </View>
             )
           }
           <View style={styles.logoutWrapper}>
-          <Button text='Kirjaudu ulos' loading={isLoggingOut} onPress={this.logout} />
+            <Button
+              text='Kirjaudu ulos'
+              loading={isLoggingOut}
+              onPress={this.logout}
+              extraStyles={{ width: '50%' }}
+            />
           </View>
         </View>
       </PageContainer>
@@ -217,7 +290,11 @@ const styles = StyleSheet.create({
   },
   logoutWrapper: {
     position: 'absolute',
-    bottom: '5%'
+    width: '100%',
+    height: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    bottom: 0
   },
   settingsButton: {
     height: 30,
@@ -250,7 +327,26 @@ const styles = StyleSheet.create({
   },
   teamApplicantWrapper: {
     width: '100%',
+    flex: 1,
     paddingTop: '2%'
+  },
+  applicantRow: {
+    width: '100%',
+    height: 55,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  applicantButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    position: 'absolute',
+    right: '2.5%',
+    width: '33%'
+  },
+  applicantImage: {
+    width: 40,
+    height: 40
   }
 })
 

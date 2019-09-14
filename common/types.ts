@@ -17,3 +17,11 @@ export interface Player {
   isApplicant: boolean,
   appliedTo: string
 }
+
+export interface TeamApplicant {
+  playerId: string,
+  playerName: string,
+  teamId: string,
+  teamName: string,
+  docId: string
+}
