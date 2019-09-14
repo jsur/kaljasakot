@@ -89,21 +89,32 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
 
   showAlert = (team: Team) => {
     Alert.alert(
-      `Liityt joukkueeseen ${team.name}.`,
+      `Pyydät liittyä joukkueeseen ${team.name}.`,
       'Oletko varma?',
       [
         { text: 'En', onPress: () => null, style: 'cancel' },
-        { text: 'Kyllä', onPress: () => this.addPlayerToTeam(team), style: 'default' }
+        { text: 'Kyllä', onPress: () => this.applyToTeam(team), style: 'default' }
       ]
     )
   }
 
-  addPlayerToTeam = async (team: Team) => {
+  applyToTeam = async (team: Team) => {
     try {
       this.setState({ loading: true })
       const player = await getLoggedInPlayer()
-      const newPlayers = [...team.players, player.id]
-      await db.collection('team').doc(team.id).update({ players: newPlayers })
+      await db.collection('applicant').add({
+        playerId: player.id,
+        playerName: player.username,
+        teamId: team.id,
+        teamName: team.name
+      })
+      this.props.appState.updateAppState({
+        currentPlayer: {
+          ...this.props.appState.currentPlayer,
+          isApplicant: true,
+          appliedTo: team.name
+        }
+      })
       await this.refreshOwnTeam()
       this.setState({ loading: false })
     } catch (error) {
@@ -114,7 +125,21 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
 
   render() {
     const { allTeams, loading } = this.state
-    const { currentTeam } = this.props.appState
+    const { currentTeam, currentPlayer } = this.props.appState
+    if (currentPlayer && currentPlayer.isApplicant) {
+      return (
+        <PageContainer>
+          <View style={styles.main}>
+            <>
+              <Text style={styles.noTeamText}>Olet hakenut joukkueeseen</Text>
+              <Text style={{ color: BEER_YELLOW, fontFamily: FONT_MEDIUM, margin: '1.5%', fontSize: 18 }}>{` ${currentPlayer.appliedTo}`}</Text>
+              <Text style={styles.noTeamText}>Odota joukkueen ylläpitäjän</Text>
+              <Text style={styles.noTeamText}>hyväksyntä / hylkäys.</Text>
+            </>
+          </View>
+        </PageContainer>
+      )
+    }
     return (
       <PageContainer>
         <View style={styles.main}>

@@ -3,7 +3,8 @@ export interface Team {
   admins: Array<string>,
   logo_url: string,
   name: string,
-  players: Array<string>
+  players: Array<string>,
+  applicants: Array<string>
 }
 
 export interface Player {
@@ -12,5 +13,7 @@ export interface Player {
   team_penalties: {
     [teamId: string]: number
   },
-  username: string
+  username: string,
+  isApplicant: boolean,
+  appliedTo: string
 }

@@ -10,6 +10,7 @@ import Button from './Button'
 import { AppContext, AppStateType } from '../AppState'
 
 import { getAuthErrorString } from '../common/auth-helpers'
+import { usernameIsValid } from '../common/common-helpers'
 
 import { BEER_YELLOW } from '../common/colors'
 
@@ -120,7 +121,7 @@ const NewUser = (props: NavigationInjectedProps) => {
           <Button
             text='Luo käyttäjä'
             loading={loading}
-            disabled={loading || !username || username.length < 3 || username.length > 15 || !email || !password || !passwordAgain}
+            disabled={loading || !usernameIsValid(username) || !email || !password || !passwordAgain}
             onPress={createUser}
           />
         </View>

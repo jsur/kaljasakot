@@ -12,8 +12,10 @@ import { withAppState, AppStateType, emptyAppState } from '../AppState'
 
 import { clearNavigationStack } from '../common/auth-helpers'
 import { uploadPhoto } from '../common/file-upload-helpers'
+import { playerIsAdmin, usernameIsValid } from '../common/common-helpers'
+
 import { LOGGEDIN_BACKGROUND, WHITE, BEER_YELLOW } from '../common/colors'
-import { FONT_REGULAR } from '../common/fonts'
+import { FONT_REGULAR, FONT_MEDIUM } from '../common/fonts'
 import { auth, db } from '../config/firebase'
 
 interface Props {
@@ -67,13 +69,8 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
     }))
   }
 
-  newUsernameIsValid = () => {
-    const { newUsername } = this.state
-    return newUsername && newUsername.length >= 3 && newUsername.length < 15
-  }
-
   updateUsername = async () => {
-    if (this.newUsernameIsValid()) {
+    if (usernameIsValid(this.state.newUsername)) {
       try {
         this.setState({ loading: true })
         const { currentPlayer } = this.props.appState
@@ -124,6 +121,7 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
   render() {
     const { currentTeam } = this.props.appState
     const { isLoggingOut, usernameInputVisible, newUsername, loading, uploadLoading } = this.state
+    const isAdmin = playerIsAdmin(this.props.appState)
     return (
       <PageContainer>
         <View style={styles.main}>
@@ -153,7 +151,7 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
                 <Button
                   text='Tallenna'
                   onPress={this.updateUsername}
-                  disabled={loading || !this.newUsernameIsValid()}
+                  disabled={loading || !usernameIsValid(newUsername)}
                   loading={loading}
                   extraStyles={{ width: '50%' }}
                 />
@@ -172,6 +170,16 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
                   loading={uploadLoading}
                   extraStyles={styles.settingsButton}
                 />
+              </View>
+            )
+          }
+          {
+            isAdmin && (
+              <View style={styles.adminSettings}>
+                <Text style={styles.settingsHeader}>Ylläpito</Text>
+                <View style={styles.teamApplicantWrapper}>
+                  <Text style={styles.settingsText}>Hyväksy / hylkää pelaaja</Text>
+                </View>
               </View>
             )
           }
@@ -229,6 +237,20 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     marginLeft: '5%'
+  },
+  adminSettings: {
+    flex: 1,
+    width: '100%',
+    paddingTop: '5%'
+  },
+  settingsHeader: {
+    fontSize: 18,
+    fontFamily: FONT_MEDIUM,
+    color: WHITE
+  },
+  teamApplicantWrapper: {
+    width: '100%',
+    paddingTop: '2%'
   }
 })
 

@@ -4,7 +4,15 @@ import { Team, Player } from './types'
 export const getLoggedInPlayer = async (): Player | undefined => {
   try {
     const snapshot = await db.collection('player').where('auth_id', '==', auth.currentUser.uid).get()
-    return snapshot.docs.length > 0 && { ...snapshot.docs[0].data(), id: snapshot.docs[0].id }
+    const playerId = snapshot.docs[0].id
+    const applicantSnapshot = await db.collection('applicant').where('playerId', '==', playerId).get()
+    const hasApplied = applicantSnapshot.docs && applicantSnapshot.docs.length > 0 && applicantSnapshot.docs[0].exists
+    return snapshot.docs.length > 0 && {
+      ...snapshot.docs[0].data(),
+      id: playerId,
+      isApplicant: hasApplied,
+      appliedTo: hasApplied && applicantSnapshot.docs[0].data().teamName
+    }
   } catch (error) {
     console.log(error)
   }

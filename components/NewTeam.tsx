@@ -45,7 +45,8 @@ class NewTeam extends React.Component<NavigationInjectedProps, State> {
         logo_url: logoUrl || 'https://firebasestorage.googleapis.com/v0/b/kaljasakot.appspot.com/o/questions-circular-button.png?alt=media&token=0fcb0852-cc21-4e82-bc0c-af6969e3f5df',
         name: teamName,
         admins: [ player.id ],
-        players: [ player.id ]
+        players: [ player.id ],
+        applicants: []
       })
     } catch (error) {
       console.log(error)

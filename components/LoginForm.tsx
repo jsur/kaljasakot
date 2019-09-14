@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
 
 import InputField from './InputField'
@@ -8,7 +8,7 @@ import ErrorText from './ErrorText'
 
 import { getAuthErrorString } from '../common/auth-helpers'
 import { storeData, retrieveData } from '../common/asyncStorage'
-import firebase from '../config/firebase'
+import { auth } from '../config/firebase'
 
 export interface LoginFormInputs {
   email: string,
@@ -34,7 +34,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
     if (loading) return
     setLoading(true)
     try {
-      await firebase.auth().signInWithEmailAndPassword(email, password)
+      await auth.signInWithEmailAndPassword(email, password)
       await storeData('email', email)
       await onSuccess()
       setLoading(false)
@@ -100,11 +100,3 @@ const styles = StyleSheet.create({
 })
 
 export default LoginForm
-
-
-  /*
-  createUser = () => {
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-    .then(success => this.goToApp())
-    .catch(error => this.setState({ errorMsg: error.message }))
-  } */
