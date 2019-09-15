@@ -25,7 +25,7 @@ const firstTabButtonNavigator = createStackNavigator({
   Landing: {
     screen: Landing,
     navigationOptions: {
-      title: 'Sakot'
+      header: null
     }
   },
   NewTeam,

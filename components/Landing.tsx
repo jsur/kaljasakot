@@ -7,7 +7,9 @@ import {
   View,
   Text,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  BackHandler,
+  NativeEventSubscription
 } from 'react-native'
 import { NavigationInjectedProps, NavigationEventSubscription } from 'react-navigation'
 
@@ -36,6 +38,7 @@ interface State {
 
 class Landing extends React.Component<NavigationInjectedProps & Props, State> {
   willFocusListener: NavigationEventSubscription = null
+  backHandlerListener: NativeEventSubscription = null
   static navigationOptions = {
     headerLayoutPreset: 'center',
     tabBarIcon: ({ focused }) => {
@@ -64,10 +67,12 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
       }
       this.setState({ loading: false })
     })
+    this.backHandlerListener = BackHandler.addEventListener('hardwareBackPress', () => true)
   }
 
   componentWillUnmount () {
     this.willFocusListener && this.willFocusListener.remove()
+    this.backHandlerListener && this.backHandlerListener.remove()
   }
 
   refreshOwnTeam = async () => {
@@ -206,7 +211,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     backgroundColor: LOGGEDIN_BACKGROUND,
-    paddingTop: '5%'
+    paddingTop: '10%'
   },
   noTeamWrapper: {
     flex: 1,
