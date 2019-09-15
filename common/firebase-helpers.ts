@@ -39,15 +39,8 @@ export const getPlayers = async (playerIds: Array<string>): Array<Player> => {
   return players
 }
 
-export const savePenalty = (penaltyAmount: number, teamId: string, player: Player) => {
-  const newPlayer = {
-    ...player,
-    team_penalties: {
-      ...player.team_penalties,
-      [teamId]: penaltyAmount
-    }
-  }
-  return db.collection('player').doc(player.id).set(newPlayer)
+export const savePenalty = (updatedPlayer: Player) => {
+  return db.collection('player').doc(updatedPlayer.id).set(updatedPlayer)
 }
 
 export const getTeamApplicants = async (teamId: string): Array<TeamApplicant> => {

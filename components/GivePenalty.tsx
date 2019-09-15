@@ -65,7 +65,18 @@ const GivePenalty = () => {
     try {
       setLoading(true)
       if (selectedPlayer && appState.currentTeam.id) {
-        await savePenalty(penaltyAmount, appState.currentTeam.id, selectedPlayer)
+        const updatedPlayer = {
+          ...selectedPlayer,
+          team_penalties: {
+            ...selectedPlayer.team_penalties,
+            [appState.currentTeam.id]: penaltyAmount
+          }
+        }
+        await savePenalty(updatedPlayer)
+        const newTeam = [...teamPlayers]
+        const playerIdx = newTeam.findIndex(item => item.id === updatedPlayer.id)
+        newTeam.splice(playerIdx, 1, updatedPlayer)
+        setTeamPlayers(newTeam)
         setSuccessMsg('Sakko päivitetty!')
       }
     } catch (error) {
@@ -91,6 +102,7 @@ const GivePenalty = () => {
               return (
                 <TouchableOpacity
                   onPress={() => {
+                    setSuccessMsg('')
                     setSelectedPlayer(isSelectedPlayer ? null : data.item)
                     setPenaltyAmount(getCurrentPenaltyAmount(data.item))
                     !selectedPlayer ? animateHeight() : null

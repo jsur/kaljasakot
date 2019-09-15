@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     width: '80%',
-    justifyContent: 'center',
+    marginTop: '5%',
     alignItems: 'center'
   },
   filler: {

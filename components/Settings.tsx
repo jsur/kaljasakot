@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Alert, StyleSheet, View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import * as DocumentPicker from 'expo-document-picker'
 
@@ -34,6 +34,8 @@ interface State {
   errorMsg: string,
   applicants: Array<TeamApplicant>
 }
+
+type ApplicantChoice = 'deny' | 'accept'
 
 class Settings extends React.Component<NavigationInjectedProps & Props, State> {
   static navigationOptions = {
@@ -141,7 +143,22 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
     }
   }
 
-  onApplicantPress = async (choice: 'deny' | 'accept', item: TeamApplicant) => {
+  showAlert = (choice: ApplicantChoice, item: TeamApplicant) => {
+    const title = choice === 'deny'
+      ? `Et hyväksy pelaajaa ${item.playerName} joukkueeseen.`
+      : `Hyväksyt pelaajan ${item.playerName} joukkueeseen.`
+
+    Alert.alert(
+      title,
+      'Oletko varma?',
+      [
+        { text: 'En', onPress: () => null, style: 'cancel' },
+        { text: 'Kyllä', onPress: () => this.onApplicantPress(choice, item), style: 'default' }
+      ]
+    )
+  }
+
+  onApplicantPress = async (choice: ApplicantChoice, item: TeamApplicant) => {
     try {
       this.setState({ applicantsLoading: true })
       await removeApplicant(item.docId)
@@ -227,14 +244,14 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
                               <View key={item.playerId} style={styles.applicantRow}>
                                 <Text style={[styles.settingsText, { color: BEER_YELLOW, flex: 1 }]}>{item.playerName}</Text>
                                 <View style={styles.applicantButtons}>
-                                  <TouchableOpacity onPress={() => this.onApplicantPress('deny', item)}>
+                                  <TouchableOpacity onPress={() => this.showAlert('deny', item)}>
                                     <Image
                                       source={require('../assets/images/cancel-red.png')}
                                       style={styles.applicantImage}
                                       resizeMode='contain'
                                     />
                                   </TouchableOpacity>
-                                  <TouchableOpacity onPress={() => this.onApplicantPress('accept', item)}>
+                                  <TouchableOpacity onPress={() => this.showAlert('accept', item)}>
                                     <Image
                                       source={require('../assets/images/checked-green.png')}
                                       style={styles.applicantImage}
@@ -256,7 +273,7 @@ class Settings extends React.Component<NavigationInjectedProps & Props, State> {
               text='Kirjaudu ulos'
               loading={isLoggingOut}
               onPress={this.logout}
-              extraStyles={{ width: '50%' }}
+              extraStyles={{ width: '60%' }}
             />
           </View>
         </View>

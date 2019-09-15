@@ -106,17 +106,17 @@ class Login extends React.Component<NavigationInjectedProps & Props> {
           <View style={[styles.bubbleWrapper, { top: height / 2, left: width / 3.2 }]}><SvgBubble width={35} height={35} /></View>
           <View style={[styles.bubbleWrapper, { top: height / 3, left: width / 1.3 }]}><SvgBubble width={25} height={25} /></View>
           <View style={styles.loginFormWrapper}>
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => this.props.navigation.navigate('NewUser')}
+            >
+              <Text style={styles.newUserText}>Luo uusi käyttäjä</Text>
+            </TouchableOpacity>
             <LoginForm
               errorMsg={errorMsg}
               onSuccess={() => this.goTo('Landing')}
             />
           </View>
-          <TouchableOpacity
-            style={{ padding: 10 }}
-            onPress={() => this.props.navigation.navigate('NewUser')}
-          >
-              <Text style={styles.newUserText}>Luo uusi käyttäjä</Text>
-            </TouchableOpacity>
         </View>
       </PageContainer>
       </>
