@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     height: '10%',
     justifyContent: 'center',
     alignItems: 'center',
-    bottom: 0
+    bottom: '2.5%'
   },
   settingsButton: {
     height: 30,

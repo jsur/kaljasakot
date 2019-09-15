@@ -45,8 +45,13 @@ const NewUser = (props: NavigationInjectedProps) => {
         auth_id: newUser.user.uid,
         team_penalties: {}
       }
-      await db.collection('player').add(newPlayer)
-      appState.updateAppState({ currentPlayer: newPlayer })
+      const playerDoc = await db.collection('player').add(newPlayer)
+      appState.updateAppState({
+        currentPlayer: {
+          ...newPlayer,
+          id: playerDoc.id
+        }
+      })
       setLoading(false)
       props.navigation.navigate('Landing')
       

@@ -89,7 +89,7 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
 
   showAlert = (team: Team) => {
     Alert.alert(
-      `Pyydät liittyä joukkueeseen ${team.name}.`,
+      `Liityt joukkueeseen ${team.name}.`,
       'Oletko varma?',
       [
         { text: 'En', onPress: () => null, style: 'cancel' },
@@ -131,6 +131,7 @@ class Landing extends React.Component<NavigationInjectedProps & Props, State> {
         <PageContainer>
           <View style={styles.main}>
             <>
+              <Image source={require('../assets/images/beer-cheers.png')} style={styles.beerCheers} resizeMode='contain' />
               <Text style={styles.noTeamText}>Olet hakenut joukkueeseen</Text>
               <Text style={{ color: BEER_YELLOW, fontFamily: FONT_MEDIUM, margin: '1.5%', fontSize: 18 }}>{` ${currentPlayer.appliedTo}`}</Text>
               <Text style={styles.noTeamText}>Odota joukkueen ylläpitäjän</Text>
@@ -268,6 +269,12 @@ const styles = StyleSheet.create({
     height: 50,
     position: 'absolute',
     left: '5%'
+  },
+  beerCheers: {
+    width: '100%',
+    height: '30%',
+    marginTop: '10%',
+    marginBottom: '10%'
   }
 })
 
