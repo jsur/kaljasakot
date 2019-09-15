@@ -7,6 +7,12 @@
     "githubUrl": "https://github.com/jsur/kaljasakot",
     "primaryColor": "#f49f3e",
     "sdkVersion": "34.0.0",
+    "android": {
+      "package": "com.jususoft.kaljasakot",
+      "permissions": [
+        "MANAGE_DOCUMENTS"
+      ]
+    },
     "platforms": [
       "ios",
       "android"
