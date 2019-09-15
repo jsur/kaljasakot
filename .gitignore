@@ -11,3 +11,4 @@ web-build/
 web-report/
 
 config/firebase.ts
+*/.DS_Store

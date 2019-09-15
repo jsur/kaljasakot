@@ -1,20 +1,22 @@
 {
   "expo": {
+    "version": "1.0.0",
     "name": "Kaljasakot",
     "slug": "kaljasakot",
     "privacy": "public",
+    "githubUrl": "https://github.com/jsur/kaljasakot",
+    "primaryColor": "#f49f3e",
     "sdkVersion": "34.0.0",
     "platforms": [
       "ios",
       "android"
     ],
-    "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/kaljasakot-icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/kaljasakot-splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#f49f3e"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
