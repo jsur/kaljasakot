@@ -31,7 +31,9 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jususoft.kaljasakot",
+      "buildNumber": "1.0.1"
     }
   }
 }
